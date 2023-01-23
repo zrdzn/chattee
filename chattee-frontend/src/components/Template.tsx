@@ -1,4 +1,4 @@
-import { Header } from "../components/Header";
+import {Header} from "../components/Header";
 import {Navbar} from "../components/Navbar";
 
 export const Template = ({ children }: any) => {
