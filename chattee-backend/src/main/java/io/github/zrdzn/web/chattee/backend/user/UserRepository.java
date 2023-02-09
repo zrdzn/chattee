@@ -1,17 +1,30 @@
 package io.github.zrdzn.web.chattee.backend.user;
 
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
+import panda.std.Blank;
+import panda.std.Result;
 
-@Repository
-public interface UserRepository extends JpaRepository<User, Long> {
+public interface UserRepository {
 
-    @Query("SELECT user FROM User user WHERE user.email = ?1")
-    Optional<User> findByEmail(String email);
+    Result<User, Exception> saveUser(User user);
 
-    List<User> findAll();
+    Result<UserPrivilege, Exception> savePrivilege(UserPrivilege privilege);
+
+    Result<List<User>, Exception> listAllUsers();
+
+    Result<List<UserPrivilege>, Exception> listAllPrivileges();
+
+    Result<Optional<User>, Exception> findUserById(long id);
+
+    Result<Optional<User>, Exception> findUserByEmail(String email);
+
+    Result<Optional<UserPrivilege>, Exception> findPrivilegeById(long id);
+
+    Result<List<UserPrivilege>, Exception> findPrivilegesByUserId(long id);
+
+    Result<Blank, Exception> deleteUser(long id);
+
+    Result<Blank, Exception> deletePrivilege(long id);
 
 }

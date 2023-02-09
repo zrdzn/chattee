@@ -1,42 +1,34 @@
 package io.github.zrdzn.web.chattee.backend.user;
 
-import io.github.zrdzn.web.chattee.backend.discussion.Discussion;
-import org.hibernate.validator.constraints.Length;
-import java.util.ArrayList;
-import java.util.List;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.validation.constraints.Email;
+import java.time.Instant;
 
-@Entity
-@Table(name = "users")
 public class User {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Email
-    @Length(min = 5, max = 50)
+    private long id;
     private String email;
-
     private String password;
+    private String username;
+    private Instant createdAt;
+    private Instant updatedAt;
 
-    @OneToMany(mappedBy = "author")
-    private List<Discussion> discussions = new ArrayList<>();
-
-    public User() {
+    public User(String email, String password, String username, Instant createdAt, Instant updatedAt) {
+        this(0L, email, password, username, createdAt, updatedAt);
     }
 
-    public Long getId() {
+    public User(long id, String email, String password, String username, Instant createdAt, Instant updatedAt) {
+        this.id = id;
+        this.email = email;
+        this.password = password;
+        this.username = username;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
+    public long getId() {
         return this.id;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
@@ -56,12 +48,28 @@ public class User {
         this.password = password;
     }
 
-    public List<Discussion> getDiscussions() {
-        return this.discussions;
+    public String getUsername() {
+        return this.username;
     }
 
-    public void setDiscussions(List<Discussion> discussions) {
-        this.discussions = discussions;
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public Instant getCreatedAt() {
+        return this.createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return this.updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
 }
