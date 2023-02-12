@@ -2,6 +2,7 @@ package io.github.zrdzn.web.chattee.backend.user;
 
 import io.github.zrdzn.web.chattee.backend.web.HttpResponse;
 import io.javalin.community.routing.annotations.Delete;
+import io.javalin.community.routing.annotations.Endpoints;
 import io.javalin.community.routing.annotations.Get;
 import io.javalin.community.routing.annotations.Post;
 import io.javalin.http.Context;
@@ -22,6 +23,7 @@ import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.created;
 import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.notFound;
 import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.ok;
 
+@Endpoints
 public class UserEndpoints {
 
     public static final String USER_ENDPOINT = "/api/v1/users";

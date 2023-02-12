@@ -9,6 +9,7 @@ import io.github.zrdzn.web.chattee.backend.user.UserFacade;
 import io.github.zrdzn.web.chattee.backend.user.session.Session;
 import io.github.zrdzn.web.chattee.backend.user.session.SessionFacade;
 import io.github.zrdzn.web.chattee.backend.web.HttpResponse;
+import io.javalin.community.routing.annotations.Endpoints;
 import io.javalin.community.routing.annotations.Post;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
@@ -24,6 +25,7 @@ import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.accepted;
 import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.badRequest;
 import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.unauthorized;
 
+@Endpoints
 public class AuthEndpoints {
 
     public static final String ENDPOINT = "/api/v1/auth";
