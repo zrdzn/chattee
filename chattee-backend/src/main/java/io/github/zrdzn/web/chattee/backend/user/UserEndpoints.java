@@ -40,13 +40,13 @@ public class UserEndpoints {
     @OpenApi(
             path = USER_ENDPOINT,
             methods = { HttpMethod.POST },
-            summary = "Create an user.",
-            description = "Creates an user and returns it.",
+            summary = "Create an user",
+            description = "Creates an user and returns it",
             tags = { "User" },
             headers = {
                     @OpenApiParam(
                             name = "Authorization",
-                            description = "Bearer authorization token.",
+                            description = "Bearer authorization token",
                             required = true,
                             example = "Bearer <your-token>"
                     )
@@ -57,17 +57,17 @@ public class UserEndpoints {
             responses = {
                     @OpenApiResponse(
                             status = "201",
-                            description = "Created user.",
+                            description = "Created user",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     ),
                     @OpenApiResponse(
                             status = "400",
-                            description = "Error message when fields were considered incorrect during validation process.",
+                            description = "Error message when fields were considered incorrect during validation process",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     ),
                     @OpenApiResponse(
                             status = "401",
-                            description = "Error message related to the unauthorized access in case of any failure.",
+                            description = "Error message caused by unauthorized access",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     )
             })
@@ -92,16 +92,20 @@ public class UserEndpoints {
     @OpenApi(
             path = PRIVILEGE_ENDPOINT,
             methods = { HttpMethod.POST },
-            summary = "Create a privilege.",
-            description = "Creates a privilege and returns it.",
+            summary = "Create a privilege",
+            description = "Creates a privilege and returns it",
             tags = { "User Privilege" },
             pathParams = {
-                    @OpenApiParam(name = "userId", description = "A numeric identifier associated with a record in the database.", required = true)
+                    @OpenApiParam(
+                            name = "userId",
+                            description = "A numeric identifier associated with a record in the database",
+                            required = true
+                    )
             },
             headers = {
                     @OpenApiParam(
                             name = "Authorization",
-                            description = "Bearer authorization token.",
+                            description = "Bearer authorization token",
                             required = true,
                             example = "Bearer <your-token>"
                     )
@@ -112,17 +116,17 @@ public class UserEndpoints {
             responses = {
                     @OpenApiResponse(
                             status = "201",
-                            description = "Created privilege.",
+                            description = "Created privilege",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     ),
                     @OpenApiResponse(
                             status = "400",
-                            description = "Error message when fields were considered incorrect during validation process.",
+                            description = "Error message when fields were considered incorrect during validation process",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     ),
                     @OpenApiResponse(
                             status = "401",
-                            description = "Error message related to the unauthorized access in case of any failure.",
+                            description = "Error message caused by unauthorized access",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     )
             })
@@ -143,13 +147,13 @@ public class UserEndpoints {
     @OpenApi(
             path = USER_ENDPOINT,
             methods = { HttpMethod.GET },
-            summary = "Get all users.",
-            description = "Returns all users.",
+            summary = "Get all users",
+            description = "Returns all users",
             tags = { "User" },
             headers = {
                     @OpenApiParam(
                             name = "Authorization",
-                            description = "Bearer authorization token.",
+                            description = "Bearer authorization token",
                             required = true,
                             example = "Bearer <your-token>"
                     )
@@ -157,12 +161,12 @@ public class UserEndpoints {
             responses = {
                     @OpenApiResponse(
                             status = "200",
-                            description = "Resulted users.",
+                            description = "Resulted users",
                             content = { @OpenApiContent(from = User[].class) }
                     ),
                     @OpenApiResponse(
                             status = "401",
-                            description = "Error message related to the unauthorized access in case of any failure.",
+                            description = "Error message caused by unauthorized access",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     )
             })
@@ -177,29 +181,33 @@ public class UserEndpoints {
     @OpenApi(
             path = PRIVILEGE_ENDPOINT,
             methods = { HttpMethod.GET },
-            summary = "Get users privileges.",
-            description = "Returns users privileges.",
+            summary = "Get users privileges",
+            description = "Returns users privileges",
             tags = { "User Privilege" },
             headers = {
                     @OpenApiParam(
                             name = "Authorization",
-                            description = "Bearer authorization token.",
+                            description = "Bearer authorization token",
                             required = true,
                             example = "Bearer <your-token>"
                     )
             },
             pathParams = {
-                    @OpenApiParam(name = "userId", description = "A numeric identifier associated with a record in the database.", required = true)
+                    @OpenApiParam(
+                            name = "userId",
+                            description = "A numeric identifier associated with a record in the database",
+                            required = true
+                    )
             },
             responses = {
                     @OpenApiResponse(
                             status = "200",
-                            description = "Resulted users privileges.",
+                            description = "Resulted users privileges",
                             content = { @OpenApiContent(from = UserPrivilege[].class) }
                     ),
                     @OpenApiResponse(
                             status = "401",
-                            description = "Error message related to the unauthorized access in case of any failure.",
+                            description = "Error message caused by unauthorized access",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     )
             })
@@ -214,32 +222,36 @@ public class UserEndpoints {
     @OpenApi(
             path = USER_ENDPOINT + "/{id}",
             methods = { HttpMethod.GET },
-            summary = "Get an user.",
-            description = "Returns an user.",
+            summary = "Get an user",
+            description = "Returns an user",
             tags = { "User" },
             headers = {
                     @OpenApiParam(
                             name = "Authorization",
-                            description = "Bearer authorization token.",
+                            description = "Bearer authorization token",
                             required = true,
                             example = "Bearer <your-token>"
                     )
             },
-            pathParams = @OpenApiParam(name = "id", description = "A numeric identifier associated with a record in the database.", required = true),
+            pathParams = @OpenApiParam(
+                    name = "id",
+                    description = "A numeric identifier associated with a record in the database",
+                    required = true
+            ),
             responses = {
                     @OpenApiResponse(
                             status = "200",
-                            description = "Resulted user.",
+                            description = "Resulted user",
                             content = { @OpenApiContent(from = User.class) }
                     ),
                     @OpenApiResponse(
                             status = "401",
-                            description = "Error message related to the unauthorized access in case of any failure.",
+                            description = "Error message caused by unauthorized access",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     ),
                     @OpenApiResponse(
                             status = "404",
-                            description = "Error message related to empty result based on your request.",
+                            description = "Error message related to empty result based on your request",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     )
             })
@@ -256,35 +268,43 @@ public class UserEndpoints {
     @OpenApi(
             path = PRIVILEGE_ENDPOINT + "/{id}",
             methods = { HttpMethod.GET },
-            summary = "Get a privilege.",
-            description = "Returns a privilege.",
+            summary = "Get a privilege",
+            description = "Returns a privilege",
             tags = { "User Privilege" },
             headers = {
                     @OpenApiParam(
                             name = "Authorization",
-                            description = "Bearer authorization token.",
+                            description = "Bearer authorization token",
                             required = true,
                             example = "Bearer <your-token>"
                     )
             },
             pathParams = {
-                    @OpenApiParam(name = "userId", description = "A numeric identifier associated with a record in the database.", required = true),
-                    @OpenApiParam(name = "id", description = "A numeric identifier associated with a record in the database.", required = true)
+                    @OpenApiParam(
+                            name = "userId",
+                            description = "A numeric identifier associated with a record in the database",
+                            required = true
+                    ),
+                    @OpenApiParam(
+                            name = "id",
+                            description = "A numeric identifier associated with a record in the database",
+                            required = true
+                    )
             },
             responses = {
                     @OpenApiResponse(
                             status = "200",
-                            description = "Resulted user privilege.",
+                            description = "Resulted user privilege",
                             content = { @OpenApiContent(from = UserPrivilege.class) }
                     ),
                     @OpenApiResponse(
                             status = "401",
-                            description = "Error message related to the unauthorized access in case of any failure.",
+                            description = "Error message caused by unauthorized access",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     ),
                     @OpenApiResponse(
                             status = "404",
-                            description = "Error message related to empty result based on your request.",
+                            description = "Error message related to empty result based on your request",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     )
             })
@@ -301,27 +321,31 @@ public class UserEndpoints {
     @OpenApi(
             path = USER_ENDPOINT + "/{id}",
             methods = { HttpMethod.DELETE },
-            summary = "Remove an user.",
-            description = "Removes an user.",
+            summary = "Remove an user",
+            description = "Removes an user",
             tags = { "User" },
             headers = {
                     @OpenApiParam(
                             name = "Authorization",
-                            description = "Bearer authorization token.",
+                            description = "Bearer authorization token",
                             required = true,
                             example = "Bearer <your-token>"
                     )
             },
-            pathParams = @OpenApiParam(name = "id", description = "A numeric identifier associated with a record in the database.", required = true),
+            pathParams = @OpenApiParam(
+                    name = "id",
+                    description = "A numeric identifier associated with a record in the database",
+                    required = true
+            ),
             responses = {
                     @OpenApiResponse(
                             status = "200",
-                            description = "Removed user.",
+                            description = "Removed user",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     ),
                     @OpenApiResponse(
                             status = "401",
-                            description = "Error message related to the unauthorized access in case of any failure.",
+                            description = "Error message caused by unauthorized access",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     )
             })
@@ -337,20 +361,28 @@ public class UserEndpoints {
     @OpenApi(
             path = PRIVILEGE_ENDPOINT + "/{id}",
             methods = { HttpMethod.DELETE },
-            summary = "Remove an user privilege.",
-            description = "Removes an user privilege.",
+            summary = "Remove an user privilege",
+            description = "Removes an user privilege",
             tags = { "User Privilege" },
             headers = {
                     @OpenApiParam(
                             name = "Authorization",
-                            description = "Bearer authorization token.",
+                            description = "Bearer authorization token",
                             required = true,
                             example = "Bearer <your-token>"
                     )
             },
             pathParams = {
-                    @OpenApiParam(name = "userId", description = "A numeric identifier associated with a record in the database.", required = true),
-                    @OpenApiParam(name = "id", description = "A numeric identifier associated with a record in the database.", required = true)
+                    @OpenApiParam(
+                            name = "userId",
+                            description = "A numeric identifier associated with a record in the database",
+                            required = true
+                    ),
+                    @OpenApiParam(
+                            name = "id",
+                            description = "A numeric identifier associated with a record in the database",
+                            required = true
+                    )
             },
             responses = {
                     @OpenApiResponse(
@@ -360,7 +392,7 @@ public class UserEndpoints {
                     ),
                     @OpenApiResponse(
                             status = "401",
-                            description = "Error message related to the unauthorized access in case of any failure.",
+                            description = "Error message caused by unauthorized access",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     )
             })

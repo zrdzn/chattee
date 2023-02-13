@@ -41,8 +41,8 @@ public class AuthEndpoints {
     @OpenApi(
             path = ENDPOINT,
             methods = { HttpMethod.POST },
-            summary = "Create an authorization token.",
-            description = "Creates an authorization token and returns it.",
+            summary = "Create an authorization token",
+            description = "Creates an authorization token and returns it",
             tags = { "Auth" },
             requestBody = @OpenApiRequestBody(
                     content = @OpenApiContent(from = AuthCredentials.class)
@@ -50,17 +50,17 @@ public class AuthEndpoints {
             responses = {
                     @OpenApiResponse(
                             status = "202",
-                            description = "Token that is used for authorizations.",
+                            description = "Token that is used for authorizations",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     ),
                     @OpenApiResponse(
                             status = "400",
-                            description = "Error message when user with provided email does not exist.",
+                            description = "Error message when user with provided email does not exist",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     ),
                     @OpenApiResponse(
                             status = "401",
-                            description = "Error message when password is incorrect or something went wrong with creating token.",
+                            description = "Error message when password is incorrect or something went wrong with creating token",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     )
             })

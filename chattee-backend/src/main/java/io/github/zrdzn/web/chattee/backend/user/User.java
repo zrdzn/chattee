@@ -11,6 +11,9 @@ public class User {
     private Instant createdAt;
     private Instant updatedAt;
 
+    public User() {
+    }
+
     public User(String email, String password, String username, Instant createdAt, Instant updatedAt) {
         this(0L, email, password, username, createdAt, updatedAt);
     }

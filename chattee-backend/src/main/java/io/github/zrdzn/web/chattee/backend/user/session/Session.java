@@ -10,6 +10,9 @@ public class Session {
     private Instant createdAt;
     private String ipAddress;
 
+    public Session() {
+    }
+
     public Session(long userId, Instant expireAt, String ipAddress) {
         this(userId, expireAt, null, ipAddress);
     }

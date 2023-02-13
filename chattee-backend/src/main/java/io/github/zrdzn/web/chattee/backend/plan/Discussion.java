@@ -7,6 +7,9 @@ public class Discussion {
     private String description;
     private long authorId;
 
+    public Discussion() {
+    }
+
     public Discussion(String title, String description, long authorId) {
         this(0L, title, description, authorId);
     }

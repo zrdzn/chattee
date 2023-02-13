@@ -35,13 +35,13 @@ public class DiscussionEndpoints {
     @OpenApi(
             path = ENDPOINT,
             methods = { HttpMethod.POST },
-            summary = "Create a discussion.",
-            description = "Creates a discussion and returns it.",
+            summary = "Create a discussion",
+            description = "Creates a discussion and returns it",
             tags = { "Discussion" },
             headers = {
                     @OpenApiParam(
                             name = "Authorization",
-                            description = "Bearer authorization token.",
+                            description = "Bearer authorization token",
                             required = true,
                             example = "Bearer <your-token>"
                     )
@@ -52,17 +52,17 @@ public class DiscussionEndpoints {
             responses = {
                     @OpenApiResponse(
                             status = "201",
-                            description = "Created discussion.",
+                            description = "Created discussion",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     ),
                     @OpenApiResponse(
                             status = "400",
-                            description = "Error message when fields were considered incorrect during validation process.",
+                            description = "Error message when fields were considered incorrect during validation process",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     ),
                     @OpenApiResponse(
                             status = "401",
-                            description = "Error message related to the unauthorized access in case of any failure.",
+                            description = "Error message caused by unauthorized access",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     )
             })
@@ -84,13 +84,13 @@ public class DiscussionEndpoints {
     @OpenApi(
             path = ENDPOINT,
             methods = { HttpMethod.GET },
-            summary = "Get all discussions.",
-            description = "Returns all discussions.",
+            summary = "Get all discussions",
+            description = "Returns all discussions",
             tags = { "Discussion" },
             headers = {
                     @OpenApiParam(
                             name = "Authorization",
-                            description = "Bearer authorization token.",
+                            description = "Bearer authorization token",
                             required = true,
                             example = "Bearer <your-token>"
                     )
@@ -98,12 +98,12 @@ public class DiscussionEndpoints {
             responses = {
                     @OpenApiResponse(
                             status = "200",
-                            description = "Resulted discussions.",
+                            description = "Resulted discussions",
                             content = { @OpenApiContent(from = Discussion[].class) }
                     ),
                     @OpenApiResponse(
                             status = "401",
-                            description = "Error message related to the unauthorized access in case of any failure.",
+                            description = "Error message caused by unauthorized access",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     )
             })
@@ -118,32 +118,36 @@ public class DiscussionEndpoints {
     @OpenApi(
             path = ENDPOINT + "/{id}",
             methods = { HttpMethod.GET },
-            summary = "Get a discussion.",
-            description = "Returns a discussion.",
+            summary = "Get a discussion",
+            description = "Returns a discussion",
             tags = { "Discussion" },
             headers = {
                     @OpenApiParam(
                             name = "Authorization",
-                            description = "Bearer authorization token.",
+                            description = "Bearer authorization token",
                             required = true,
                             example = "Bearer <your-token>"
                     )
             },
-            pathParams = @OpenApiParam(name = "id", description = "A numeric identifier associated with a record in the database.", required = true),
+            pathParams = @OpenApiParam(
+                    name = "id",
+                    description = "A numeric identifier associated with a record in the database",
+                    required = true
+            ),
             responses = {
                     @OpenApiResponse(
                             status = "200",
-                            description = "Resulted discussion.",
+                            description = "Resulted discussion",
                             content = { @OpenApiContent(from = Discussion.class) }
                     ),
                     @OpenApiResponse(
                             status = "401",
-                            description = "Error message related to the unauthorized access in case of any failure.",
+                            description = "Error message caused by unauthorized access",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     ),
                     @OpenApiResponse(
                             status = "404",
-                            description = "Error message related to empty result based on your request.",
+                            description = "Error message related to empty result based on your request",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     )
             })
@@ -160,27 +164,31 @@ public class DiscussionEndpoints {
     @OpenApi(
             path = ENDPOINT + "/{id}",
             methods = { HttpMethod.DELETE },
-            summary = "Remove a discussion.",
-            description = "Removes a discussion.",
+            summary = "Remove a discussion",
+            description = "Removes a discussion",
             tags = { "Discussion" },
             headers = {
                     @OpenApiParam(
                             name = "Authorization",
-                            description = "Bearer authorization token.",
+                            description = "Bearer authorization token",
                             required = true,
                             example = "Bearer <your-token>"
                     )
             },
-            pathParams = @OpenApiParam(name = "id", description = "A numeric identifier associated with a record in the database.", required = true),
+            pathParams = @OpenApiParam(
+                    name = "id",
+                    description = "A numeric identifier associated with a record in the database",
+                    required = true
+            ),
             responses = {
                     @OpenApiResponse(
                             status = "200",
-                            description = "Removed discussion.",
+                            description = "Removed discussion",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     ),
                     @OpenApiResponse(
                             status = "401",
-                            description = "Error message related to the unauthorized access in case of any failure.",
+                            description = "Error message caused by unauthorized access",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     )
             })
