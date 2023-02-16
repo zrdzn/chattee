@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.github.zrdzn.web.chattee.backend.ChatteeConfig;
 import io.github.zrdzn.web.chattee.backend.plan.DiscussionWebConfig;
@@ -24,9 +25,12 @@ import io.javalin.config.JavalinConfig;
 import io.javalin.http.ContentType;
 import io.javalin.http.HttpStatus;
 import io.javalin.json.JavalinJackson;
+import io.javalin.openapi.BasicAuth;
 import io.javalin.openapi.OpenApiInfo;
 import io.javalin.openapi.plugin.OpenApiConfiguration;
 import io.javalin.openapi.plugin.OpenApiPlugin;
+import io.javalin.openapi.plugin.OpenApiPluginConfiguration;
+import io.javalin.openapi.plugin.SecurityConfiguration;
 import io.javalin.openapi.plugin.swagger.SwaggerConfiguration;
 import io.javalin.openapi.plugin.swagger.SwaggerPlugin;
 import io.javalin.plugin.bundled.CorsPluginConfig;
@@ -95,16 +99,16 @@ public class HttpServer {
     }
 
     private void configureOpenApi(JavalinConfig config) {
-        OpenApiConfiguration openApiConfig = new OpenApiConfiguration();
-
-        OpenApiInfo openApiInfo = new OpenApiInfo();
-        openApiInfo.setVersion("1.0.0");
-        openApiInfo.setTitle("Chattee API");
-        openApiInfo.setDescription("Official API of the Chattee.");
-
-        openApiConfig.setInfo(openApiInfo);
-
-        config.plugins.register(new OpenApiPlugin(openApiConfig));
+        config.plugins.register(new OpenApiPlugin(
+                new OpenApiPluginConfiguration()
+                        .withDefinitionConfiguration((version, definition) -> definition
+                                .withOpenApiInfo((openApiInfo) -> {
+                                    openApiInfo.setTitle("Chattee API");
+                                    openApiInfo.setVersion("1.0.0");
+                                    openApiInfo.setDescription("Official API of the Chattee");
+                                })
+                )
+        ));
     }
 
     private void configureSwagger(JavalinConfig config) {
