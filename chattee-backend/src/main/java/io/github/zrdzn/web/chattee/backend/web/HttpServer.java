@@ -6,17 +6,16 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.node.TextNode;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.github.zrdzn.web.chattee.backend.ChatteeConfig;
 import io.github.zrdzn.web.chattee.backend.plan.DiscussionWebConfig;
 import io.github.zrdzn.web.chattee.backend.storage.postgres.PostgresStorage;
-import io.github.zrdzn.web.chattee.backend.user.UserWebConfig;
-import io.github.zrdzn.web.chattee.backend.user.auth.AuthWebConfig;
-import io.github.zrdzn.web.chattee.backend.user.session.SessionFacade;
-import io.github.zrdzn.web.chattee.backend.user.session.SessionRepository;
-import io.github.zrdzn.web.chattee.backend.user.session.SessionService;
-import io.github.zrdzn.web.chattee.backend.user.session.infrastructure.PostgresSessionRepository;
+import io.github.zrdzn.web.chattee.backend.account.AccountWebConfig;
+import io.github.zrdzn.web.chattee.backend.account.auth.AuthWebConfig;
+import io.github.zrdzn.web.chattee.backend.account.session.SessionFacade;
+import io.github.zrdzn.web.chattee.backend.account.session.SessionRepository;
+import io.github.zrdzn.web.chattee.backend.account.session.SessionService;
+import io.github.zrdzn.web.chattee.backend.account.session.infrastructure.PostgresSessionRepository;
 import io.github.zrdzn.web.chattee.backend.web.security.token.AccessTokenFacade;
 import io.github.zrdzn.web.chattee.backend.web.security.token.AccessTokenService;
 import io.javalin.Javalin;
@@ -25,12 +24,8 @@ import io.javalin.config.JavalinConfig;
 import io.javalin.http.ContentType;
 import io.javalin.http.HttpStatus;
 import io.javalin.json.JavalinJackson;
-import io.javalin.openapi.BasicAuth;
-import io.javalin.openapi.OpenApiInfo;
-import io.javalin.openapi.plugin.OpenApiConfiguration;
 import io.javalin.openapi.plugin.OpenApiPlugin;
 import io.javalin.openapi.plugin.OpenApiPluginConfiguration;
-import io.javalin.openapi.plugin.SecurityConfiguration;
 import io.javalin.openapi.plugin.swagger.SwaggerConfiguration;
 import io.javalin.openapi.plugin.swagger.SwaggerPlugin;
 import io.javalin.plugin.bundled.CorsPluginConfig;
@@ -73,8 +68,8 @@ public class HttpServer {
     private void configureRoutes(JavalinConfig config, PostgresStorage postgresStorage) {
         AnnotationsRoutingPlugin plugin = new AnnotationsRoutingPlugin();
 
-        UserWebConfig userWebConfig = new UserWebConfig(postgresStorage);
-        userWebConfig.initialize(plugin);
+        AccountWebConfig accountWebConfig = new AccountWebConfig(postgresStorage);
+        accountWebConfig.initialize(plugin);
 
         new DiscussionWebConfig(postgresStorage).initialize(plugin);
 
@@ -82,7 +77,7 @@ public class HttpServer {
         SessionService sessionService = new SessionService(sessionRepository, new AccessTokenFacade(new AccessTokenService()));
         SessionFacade sessionFacade = new SessionFacade(sessionService);
 
-        new AuthWebConfig(userWebConfig.getUserFacade(), sessionFacade).initialize(plugin);
+        new AuthWebConfig(accountWebConfig.getUserFacade(), sessionFacade).initialize(plugin);
 
         config.plugins.register(plugin);
     }

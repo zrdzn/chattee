@@ -1,4 +1,4 @@
-package io.github.zrdzn.web.chattee.backend.user.session.infrastructure;
+package io.github.zrdzn.web.chattee.backend.account.session.infrastructure;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9,18 +9,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import io.github.zrdzn.web.chattee.backend.storage.postgres.PostgresStorage;
-import io.github.zrdzn.web.chattee.backend.user.session.Session;
-import io.github.zrdzn.web.chattee.backend.user.session.SessionRepository;
+import io.github.zrdzn.web.chattee.backend.account.session.Session;
+import io.github.zrdzn.web.chattee.backend.account.session.SessionRepository;
 import panda.std.Blank;
 import panda.std.Result;
 
 public class PostgresSessionRepository implements SessionRepository {
 
-    private static final String INSERT_SESSION = "insert into sessions (token, user_id, expire_at, ip_address) values (?, ?, ?, ?);";
+    private static final String INSERT_SESSION = "insert into sessions (token, account_id, expire_at, ip_address) values (?, ?, ?, ?);";
 
-    private static final String SELECT_ALL_SESSIONS = "select token, user_id, created_at, expire_at, ip_address from sessions;";
+    private static final String SELECT_ALL_SESSIONS = "select token, account_id, created_at, expire_at, ip_address from sessions;";
 
-    private static final String SELECT_SESSION_BY_TOKEN = "select user_id, created_at, expire_at, ip_address from sessions where token = ?;";
+    private static final String SELECT_SESSION_BY_TOKEN = "select account_id, created_at, expire_at, ip_address from sessions where token = ?;";
 
     private static final String DELETE_SESSION_BY_TOKEN = "delete from sessions where token = ?;";
 
@@ -36,7 +36,7 @@ public class PostgresSessionRepository implements SessionRepository {
             try (Connection connection = this.postgresStorage.getHikariDataSource().getConnection();
                  PreparedStatement statement = connection.prepareStatement(INSERT_SESSION)) {
                 statement.setString(1, session.getToken());
-                statement.setLong(2, session.getUserId());
+                statement.setLong(2, session.getAccountId());
                 statement.setTimestamp(3, Timestamp.from(session.getExpireAt()));
                 statement.setString(4, session.getIpAddress());
 

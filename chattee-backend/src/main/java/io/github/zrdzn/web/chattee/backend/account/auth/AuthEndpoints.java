@@ -1,13 +1,14 @@
-package io.github.zrdzn.web.chattee.backend.user.auth;
+package io.github.zrdzn.web.chattee.backend.account.auth;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import at.favre.lib.crypto.bcrypt.BCrypt;
-import io.github.zrdzn.web.chattee.backend.user.User;
-import io.github.zrdzn.web.chattee.backend.user.UserFacade;
-import io.github.zrdzn.web.chattee.backend.user.session.Session;
-import io.github.zrdzn.web.chattee.backend.user.session.SessionFacade;
+import io.github.zrdzn.web.chattee.backend.account.Account;
+import io.github.zrdzn.web.chattee.backend.account.AccountDetailsDto;
+import io.github.zrdzn.web.chattee.backend.account.AccountFacade;
+import io.github.zrdzn.web.chattee.backend.account.session.Session;
+import io.github.zrdzn.web.chattee.backend.account.session.SessionFacade;
 import io.github.zrdzn.web.chattee.backend.web.HttpResponse;
 import io.javalin.community.routing.annotations.Endpoints;
 import io.javalin.community.routing.annotations.Post;
@@ -30,11 +31,11 @@ public class AuthEndpoints {
 
     public static final String ENDPOINT = "/api/v1/auth";
 
-    private final UserFacade userFacade;
+    private final AccountFacade accountFacade;
     private final SessionFacade sessionFacade;
 
-    public AuthEndpoints(UserFacade userFacade, SessionFacade sessionFacade) {
-        this.userFacade = userFacade;
+    public AuthEndpoints(AccountFacade accountFacade, SessionFacade sessionFacade) {
+        this.accountFacade = accountFacade;
         this.sessionFacade = sessionFacade;
     }
 
@@ -55,7 +56,7 @@ public class AuthEndpoints {
                     ),
                     @OpenApiResponse(
                             status = "400",
-                            description = "Error message when user with provided email does not exist",
+                            description = "Error message when account with provided email does not exist",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     ),
                     @OpenApiResponse(
@@ -71,23 +72,23 @@ public class AuthEndpoints {
                         .filter(credentials -> credentials.getEmail() != null, ignored -> badRequest("'email' must not be null."))
                         .filter(credentials -> credentials.getPassword() != null, ignored -> badRequest("'password' must not be null."))
                         .flatMap(user -> {
-                            Result<Optional<User>, HttpResponse> userResult = this.userFacade.getUser(user.getEmail());
-                            if (userResult.isErr()) {
-                                return Result.error(badRequest("User with provided email does not exist."));
+                            Result<Optional<AccountDetailsDto>, HttpResponse> accountResult = this.accountFacade.getAccount(user.getEmail());
+                            if (accountResult.isErr()) {
+                                return Result.error(badRequest("Account with provided email does not exist."));
                             }
 
-                            Optional<User> userMaybe = userResult.get();
-                            if (userMaybe.isEmpty()) {
-                                return Result.error(badRequest("User with provided email does not exist."));
+                            Optional<AccountDetailsDto> accountMaybe = accountResult.get();
+                            if (accountMaybe.isEmpty()) {
+                                return Result.error(badRequest("Account with provided email does not exist."));
                             }
 
-                            User foundUser = userMaybe.get();
+                            AccountDetailsDto foundAccount = accountMaybe.get();
 
-                            if (!BCrypt.verifyer().verify(user.getPassword().toCharArray(), foundUser.getPassword().toCharArray()).verified) {
+                            if (!BCrypt.verifyer().verify(user.getPassword().toCharArray(), foundAccount.getPassword().toCharArray()).verified) {
                                 return Result.error(unauthorized("Provided password is invalid."));
                             }
 
-                            Session session = new Session(foundUser.getId(), Instant.now().plus(7, ChronoUnit.DAYS), context.ip());
+                            Session session = new Session(foundAccount.getId(), Instant.now().plus(7, ChronoUnit.DAYS), context.ip());
 
                             Result<Session, HttpResponse> createSessionResult = this.sessionFacade.createSession(session);
                             if (createSessionResult.isErr()) {
@@ -95,7 +96,9 @@ public class AuthEndpoints {
                             }
 
                             return createSessionResult;
-                        }).peek(session -> context.status(HttpStatus.ACCEPTED).json(accepted(session.getToken())))
+                        }).peek(session -> context.status(HttpStatus.ACCEPTED)
+                                .json(accepted(session.getToken()))
+                                .cachedSessionAttribute("sessionid", session.getToken()))
                         .onError(error -> context.status(error.code()).json(error)));
     }
 

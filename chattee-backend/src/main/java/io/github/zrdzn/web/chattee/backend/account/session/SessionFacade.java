@@ -1,4 +1,4 @@
-package io.github.zrdzn.web.chattee.backend.user.session;
+package io.github.zrdzn.web.chattee.backend.account.session;
 
 import java.util.List;
 import java.util.Optional;

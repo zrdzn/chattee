@@ -1,4 +1,4 @@
-package io.github.zrdzn.web.chattee.backend.user.auth;
+package io.github.zrdzn.web.chattee.backend.account.auth;
 
 public class AuthCredentials {
 

@@ -1,20 +1,20 @@
-package io.github.zrdzn.web.chattee.backend.user;
+package io.github.zrdzn.web.chattee.backend.account;
 
 import io.github.zrdzn.web.chattee.backend.web.security.Privilege;
 
-public class UserPrivilege {
+public class AccountPrivilege {
 
     private long id;
-    private long userId;
+    private long accountId;
     private Privilege privilege;
 
-    public UserPrivilege(long userId, Privilege privilege) {
-        this(0L, userId, privilege);
+    public AccountPrivilege(long accountId, Privilege privilege) {
+        this(0L, accountId, privilege);
     }
 
-    public UserPrivilege(long id, long userId, Privilege privilege) {
+    public AccountPrivilege(long id, long accountId, Privilege privilege) {
         this.id = id;
-        this.userId = userId;
+        this.accountId = accountId;
         this.privilege = privilege;
     }
 
@@ -26,12 +26,12 @@ public class UserPrivilege {
         this.id = id;
     }
 
-    public long getUserId() {
-        return this.userId;
+    public long getAccountId() {
+        return this.accountId;
     }
 
-    public void setUserId(long userId) {
-        this.userId = userId;
+    public void setAccountId(long accountId) {
+        this.accountId = accountId;
     }
 
     public Privilege getPrivilege() {
