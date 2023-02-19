@@ -13,7 +13,6 @@ import io.javalin.openapi.OpenApiContent;
 import io.javalin.openapi.OpenApiParam;
 import io.javalin.openapi.OpenApiRequestBody;
 import io.javalin.openapi.OpenApiResponse;
-import java.util.regex.Pattern;
 
 import static io.github.zrdzn.web.chattee.backend.web.ContextExtensions.bodyAsClass;
 import static io.github.zrdzn.web.chattee.backend.web.ContextExtensions.pathParamAsLong;
@@ -23,25 +22,22 @@ import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.notFound;
 import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.ok;
 
 @Endpoints
-public class AccountEndpoints {
+public class AccountPrivilegeEndpoints {
 
-    public static final String ACCOUNT_ENDPOINT = "/api/v1/accounts";
-    public static final String PRIVILEGE_ENDPOINT = "/api/v1/accounts/{accountId}/privileges";
-
-    private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Z\\d._%+-]+@[A-Z\\d.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+    public static final String PRIVILEGE_ENDPOINT = "/api/v1/privileges";
 
     private final AccountFacade accountFacade;
 
-    public AccountEndpoints(AccountFacade accountFacade) {
+    public AccountPrivilegeEndpoints(AccountFacade accountFacade) {
         this.accountFacade = accountFacade;
     }
 
     @OpenApi(
-            path = ACCOUNT_ENDPOINT + "/register",
+            path = PRIVILEGE_ENDPOINT,
             methods = { HttpMethod.POST },
-            summary = "Registers an account",
-            description = "Registers an account and returns it",
-            tags = { "Account" },
+            summary = "Create a privilege",
+            description = "Creates a privilege and returns it",
+            tags = { "Account Privilege" },
             headers = {
                     @OpenApiParam(
                             name = "Authorization",
@@ -51,12 +47,12 @@ public class AccountEndpoints {
                     )
             },
             requestBody = @OpenApiRequestBody(
-                    content = @OpenApiContent(from = Account.class)
+                    content = @OpenApiContent(from = AccountPrivilege.class)
             ),
             responses = {
                     @OpenApiResponse(
                             status = "201",
-                            description = "Registered account",
+                            description = "Created privilege",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     ),
                     @OpenApiResponse(
@@ -70,55 +66,14 @@ public class AccountEndpoints {
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     )
             })
-    @Post(ACCOUNT_ENDPOINT + "/register")
-    public void registerAccount(Context context) {
+    @Post(PRIVILEGE_ENDPOINT)
+    public void createPrivilege(Context context) {
         context.async(() ->
-                bodyAsClass(context, AccountRegisterDto.class, "Account body is empty or invalid.")
-                        .filter(account -> account.getEmail() != null, ignored -> badRequest("'email' must not be null."))
-                        .filter(account -> validateEmail(account.getEmail()), ignored -> badRequest("'email' is not a valid email."))
-                        .filter(account -> account.getEmail().length() < 65, ignored -> badRequest("'email' must be shorter than 65 characters."))
-                        .filter(account -> account.getRawPassword() != null, ignored -> badRequest("'rawPassword' must not be null."))
-                        .filter(account -> account.getRawPassword().length() > 6, ignored -> badRequest("'rawPassword' must be longer than 6 characters."))
-                        .filter(account -> account.getRawPassword().length() < 81, ignored -> badRequest("'rawPassword' must be shorter than 81 characters."))
-                        .filter(account -> account.getUsername() != null, ignored -> badRequest("'username' must not be null."))
-                        .filter(account -> account.getUsername().length() > 3, ignored -> badRequest("'username' must be longer than 3 characters."))
-                        .filter(account -> account.getUsername().length() < 33, ignored -> badRequest("'username' must be shorter than 33 characters."))
-                        .flatMap(this.accountFacade::registerAccount)
-                        .peek(ignored -> context.status(HttpStatus.CREATED).json(created("Account has been registered.")))
-                        .onError(error -> context.status(error.code()).json(error)));
-    }
-
-    @OpenApi(
-            path = ACCOUNT_ENDPOINT,
-            methods = { HttpMethod.GET },
-            summary = "Get all accounts",
-            description = "Returns all accounts",
-            tags = { "Account" },
-            headers = {
-                    @OpenApiParam(
-                            name = "Authorization",
-                            description = "Bearer authorization token",
-                            required = true,
-                            example = "Bearer <your-token>"
-                    )
-            },
-            responses = {
-                    @OpenApiResponse(
-                            status = "200",
-                            description = "Resulted accounts",
-                            content = { @OpenApiContent(from = Account[].class) }
-                    ),
-                    @OpenApiResponse(
-                            status = "401",
-                            description = "Error message caused by unauthorized access",
-                            content = { @OpenApiContent(from = HttpResponse.class) }
-                    )
-            })
-    @Get(ACCOUNT_ENDPOINT)
-    public void getAllAccounts(Context context) {
-        context.async(() ->
-                this.accountFacade.getAllAccounts()
-                        .peek(accounts -> context.status(HttpStatus.OK).json(accounts))
+                bodyAsClass(context, AccountPrivilege.class, "Privilege body is empty or invalid.")
+                        .filter(privilege -> privilege.getAccountId() > 0L, ignored -> badRequest("'accountId' must be higher than 0."))
+                        .filter(privilege -> privilege.getPrivilege() != null, ignored -> badRequest("'privilege' must not be null."))
+                        .flatMap(this.accountFacade::createPrivilege)
+                        .peek(ignored -> context.status(HttpStatus.CREATED).json(created("Privilege has been created.")))
                         .onError(error -> context.status(error.code()).json(error)));
     }
 
@@ -136,13 +91,6 @@ public class AccountEndpoints {
                             example = "Bearer <your-token>"
                     )
             },
-            pathParams = {
-                    @OpenApiParam(
-                            name = "accountId",
-                            description = "A numeric identifier associated with a record in the database",
-                            required = true
-                    )
-            },
             responses = {
                     @OpenApiResponse(
                             status = "200",
@@ -158,18 +106,17 @@ public class AccountEndpoints {
     @Get(PRIVILEGE_ENDPOINT)
     public void getAllPrivileges(Context context) {
         context.async(() ->
-                pathParamAsLong(context, "accountId", "Specified identifier is not a valid long number.")
-                        .flatMap(this.accountFacade::getPrivilegesByAccountId)
+                this.accountFacade.getAllPrivileges()
                         .peek(privileges -> context.status(HttpStatus.OK).json(privileges))
                         .onError(error -> context.status(error.code()).json(error)));
     }
 
     @OpenApi(
-            path = ACCOUNT_ENDPOINT + "/{id}",
+            path = PRIVILEGE_ENDPOINT + "/{id}",
             methods = { HttpMethod.GET },
-            summary = "Get an account",
-            description = "Returns an account",
-            tags = { "Account" },
+            summary = "Get a privilege",
+            description = "Returns a privilege",
+            tags = { "Account Privilege" },
             headers = {
                     @OpenApiParam(
                             name = "Authorization",
@@ -178,16 +125,18 @@ public class AccountEndpoints {
                             example = "Bearer <your-token>"
                     )
             },
-            pathParams = @OpenApiParam(
-                    name = "id",
-                    description = "A numeric identifier associated with a record in the database",
-                    required = true
-            ),
+            pathParams = {
+                    @OpenApiParam(
+                            name = "id",
+                            description = "A numeric identifier associated with a record in the database",
+                            required = true
+                    )
+            },
             responses = {
                     @OpenApiResponse(
                             status = "200",
-                            description = "Resulted account",
-                            content = { @OpenApiContent(from = Account.class) }
+                            description = "Resulted account privilege",
+                            content = { @OpenApiContent(from = AccountPrivilege.class) }
                     ),
                     @OpenApiResponse(
                             status = "401",
@@ -200,22 +149,22 @@ public class AccountEndpoints {
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     )
             })
-    @Get(ACCOUNT_ENDPOINT + "/{id}")
-    public void getAccount(Context context) {
+    @Get(PRIVILEGE_ENDPOINT + "/{id}")
+    public void getPrivilege(Context context) {
         context.async(() ->
                 pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
-                        .flatMap(this.accountFacade::getAccount)
-                        .peek(accountMaybe -> accountMaybe.ifPresentOrElse(account -> context.status(HttpStatus.OK).json(account),
-                                () -> context.status(HttpStatus.NOT_FOUND).json(notFound("Could not find this account."))))
+                        .flatMap(this.accountFacade::getPrivilege)
+                        .peek(privilegeMaybe -> privilegeMaybe.ifPresentOrElse(privilege -> context.status(HttpStatus.OK).json(privilege),
+                                () -> context.status(HttpStatus.NOT_FOUND).json(notFound("Could not find a privilege."))))
                         .onError(error -> context.status(error.code()).json(error)));
     }
 
     @OpenApi(
-            path = ACCOUNT_ENDPOINT + "/{id}",
+            path = PRIVILEGE_ENDPOINT + "/{id}",
             methods = { HttpMethod.DELETE },
-            summary = "Remove an account",
-            description = "Removes an account",
-            tags = { "Account" },
+            summary = "Remove a privilege",
+            description = "Removes a privilege",
+            tags = { "Account Privilege" },
             headers = {
                     @OpenApiParam(
                             name = "Authorization",
@@ -224,15 +173,17 @@ public class AccountEndpoints {
                             example = "Bearer <your-token>"
                     )
             },
-            pathParams = @OpenApiParam(
-                    name = "id",
-                    description = "A numeric identifier associated with a record in the database",
-                    required = true
-            ),
+            pathParams = {
+                    @OpenApiParam(
+                            name = "id",
+                            description = "A numeric identifier associated with a record in the database",
+                            required = true
+                    )
+            },
             responses = {
                     @OpenApiResponse(
                             status = "200",
-                            description = "Removed account",
+                            description = "Removed account privilege.",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     ),
                     @OpenApiResponse(
@@ -241,17 +192,13 @@ public class AccountEndpoints {
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     )
             })
-    @Delete(ACCOUNT_ENDPOINT + "/{id}")
-    public void removeAccount(Context context) {
+    @Delete(PRIVILEGE_ENDPOINT + "/{id}")
+    public void removePrivilege(Context context) {
         context.async(() ->
                 pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
-                        .flatMap(this.accountFacade::removeAccount)
-                        .peek(ignored -> context.status(HttpStatus.OK).json(ok("Account has been removed.")))
+                        .flatMap(this.accountFacade::removePrivilege)
+                        .peek(ignored -> context.status(HttpStatus.OK).json(ok("Privilege has been removed.")))
                         .onError(error -> context.status(error.code()).json(error)));
-    }
-
-    private static boolean validateEmail(String rawEmail) {
-        return EMAIL_PATTERN.matcher(rawEmail).find();
     }
 
 }

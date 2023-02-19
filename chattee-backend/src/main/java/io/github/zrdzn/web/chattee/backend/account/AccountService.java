@@ -67,6 +67,12 @@ public class AccountService {
                 .mapErr(error -> internalServerError("Could not retrieve all privileges."));
     }
 
+    public Result<List<AccountPrivilege>, HttpResponse> getPrivilegesByAccountId(long id) {
+        return this.accountRepository.findPrivilegesByAccountId(id)
+                .onError(error -> Logger.error(error, "Could not find privileges."))
+                .mapErr(error -> internalServerError("Could not retrieve privileges."));
+    }
+
     public Result<Optional<AccountDetailsDto>, HttpResponse> getAccount(long id) {
         return this.accountRepository.findAccountById(id)
                 .map(account -> account.map(AccountDetailsDto::new))
@@ -85,12 +91,6 @@ public class AccountService {
         return this.accountRepository.findPrivilegeById(id)
                 .onError(error -> Logger.error(error, "Could not find a privilege."))
                 .mapErr(error -> internalServerError("Could not retrieve a privilege."));
-    }
-
-    public Result<List<AccountPrivilege>, HttpResponse> getPrivilegesByAccountId(long id) {
-        return this.accountRepository.findPrivilegesByAccountId(id)
-                .onError(error -> Logger.error(error, "Could not find privileges."))
-                .mapErr(error -> internalServerError("Could not retrieve privileges."));
     }
 
     public Result<Blank, HttpResponse> removeAccount(long id) {

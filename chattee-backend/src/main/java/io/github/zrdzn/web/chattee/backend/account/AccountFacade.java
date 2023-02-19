@@ -30,6 +30,10 @@ public class AccountFacade {
         return this.accountService.getAllPrivileges();
     }
 
+    public Result<List<AccountPrivilege>, HttpResponse> getPrivilegesByAccountId(long id) {
+        return this.accountService.getPrivilegesByAccountId(id);
+    }
+
     public Result<Optional<AccountDetailsDto>, HttpResponse> getAccount(long id) {
         return this.accountService.getAccount(id);
     }
@@ -40,10 +44,6 @@ public class AccountFacade {
 
     public Result<Optional<AccountPrivilege>, HttpResponse> getPrivilege(long id) {
         return this.accountService.getPrivilege(id);
-    }
-
-    public Result<List<AccountPrivilege>, HttpResponse> getPrivilegesByAccountId(long id) {
-        return this.accountService.getPrivilegesByAccountId(id);
     }
 
     public Result<Blank, HttpResponse> removeAccount(long id) {

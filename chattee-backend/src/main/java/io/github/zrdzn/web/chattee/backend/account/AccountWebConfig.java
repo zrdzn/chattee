@@ -20,8 +20,12 @@ public class AccountWebConfig implements WebConfig {
         AccountRepository accountRepository = new PostgresAccountRepository(this.postgresStorage);
         AccountService accountService = new AccountService(accountRepository);
         this.accountFacade = new AccountFacade(accountService);
+
         AccountEndpoints accountEndpoints = new AccountEndpoints(this.accountFacade);
+        AccountPrivilegeEndpoints accountPrivilegeEndpoints = new AccountPrivilegeEndpoints(this.accountFacade);
+
         plugin.registerEndpoints(accountEndpoints);
+        plugin.registerEndpoints(accountPrivilegeEndpoints);
     }
 
     public AccountFacade getUserFacade() {
