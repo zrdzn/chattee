@@ -46,7 +46,7 @@ public class AccountService {
                 .mapErr(error -> {
                     if (error instanceof SQLException sqlException) {
                         if (sqlException.getSQLState().equalsIgnoreCase(PSQLState.FOREIGN_KEY_VIOLATION.getState())) {
-                            return badRequest("'userId' does not target an existing record.");
+                            return badRequest("'accountId' does not target an existing record.");
                         }
                     }
 
