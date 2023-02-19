@@ -1,4 +1,4 @@
-package io.github.zrdzn.web.chattee.backend.plan;
+package io.github.zrdzn.web.chattee.backend.discussion;
 
 public class Discussion {
 

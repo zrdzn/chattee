@@ -1,12 +1,12 @@
-package io.github.zrdzn.web.chattee.backend.plan.infrastructure;
+package io.github.zrdzn.web.chattee.backend.discussion.infrastructure;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import io.github.zrdzn.web.chattee.backend.plan.Discussion;
-import io.github.zrdzn.web.chattee.backend.plan.DiscussionRepository;
+import io.github.zrdzn.web.chattee.backend.discussion.Discussion;
+import io.github.zrdzn.web.chattee.backend.discussion.DiscussionRepository;
 import panda.std.Blank;
 import panda.std.Result;
 

@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.github.zrdzn.web.chattee.backend.ChatteeConfig;
-import io.github.zrdzn.web.chattee.backend.plan.DiscussionWebConfig;
+import io.github.zrdzn.web.chattee.backend.discussion.DiscussionWebConfig;
 import io.github.zrdzn.web.chattee.backend.storage.postgres.PostgresStorage;
 import io.github.zrdzn.web.chattee.backend.account.AccountWebConfig;
 import io.github.zrdzn.web.chattee.backend.account.auth.AuthWebConfig;

@@ -1,4 +1,4 @@
-package io.github.zrdzn.web.chattee.backend.plan;
+package io.github.zrdzn.web.chattee.backend.discussion;
 
 import io.github.zrdzn.web.chattee.backend.web.HttpResponse;
 import io.javalin.community.routing.annotations.Delete;
@@ -73,9 +73,10 @@ public class DiscussionEndpoints {
                         .filter(discussion -> discussion.getTitle() != null, ignored -> badRequest("'title' must not be null."))
                         .filter(discussion -> discussion.getTitle().length() > 3, ignored -> badRequest("'title' must be longer than 3 characters."))
                         .filter(discussion -> discussion.getTitle().length() < 31, ignored -> badRequest("'title' must be shorter than 101 characters."))
-                        .filter(discussion -> discussion.getTitle() != null, ignored -> badRequest("'description' must not be null."))
-                        .filter(discussion -> discussion.getTitle().length() > 10, ignored -> badRequest("'description' must be longer than 10 characters."))
-                        .filter(discussion -> discussion.getTitle().length() < 2001, ignored -> badRequest("'description' must be shorter than 2001 characters."))
+                        .filter(discussion -> discussion.getDescription() != null, ignored -> badRequest("'description' must not be null."))
+                        .filter(discussion -> discussion.getDescription().length() > 10, ignored -> badRequest("'description' must be longer than 10 characters."))
+                        .filter(discussion -> discussion.getDescription().length() < 2001, ignored -> badRequest("'description' must be shorter than 2001 characters."))
+                        .filter(discussion -> discussion.getAuthorId() > 0L, ignored -> badRequest("'authorId' must be higher than 0."))
                         .flatMap(this.discussionFacade::createDiscussion)
                         .peek(shop -> context.status(HttpStatus.CREATED).json(created("Discussion has been created.")))
                         .onError(error -> context.status(error.code()).json(error)));

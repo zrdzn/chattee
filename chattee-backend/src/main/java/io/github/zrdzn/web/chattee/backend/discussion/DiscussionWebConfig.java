@@ -1,6 +1,6 @@
-package io.github.zrdzn.web.chattee.backend.plan;
+package io.github.zrdzn.web.chattee.backend.discussion;
 
-import io.github.zrdzn.web.chattee.backend.plan.infrastructure.PostgresDiscussionRepository;
+import io.github.zrdzn.web.chattee.backend.discussion.infrastructure.PostgresDiscussionRepository;
 import io.github.zrdzn.web.chattee.backend.storage.postgres.PostgresStorage;
 import io.github.zrdzn.web.chattee.backend.web.WebConfig;
 import io.javalin.community.routing.annotations.AnnotationsRoutingPlugin;
