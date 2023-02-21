@@ -4,4 +4,4 @@ Simple Open Source forum engine.
 #### Frontend
 [Next.JS](https://nextjs.org/) + [TailwindCSS](https://tailwindcss.com/)
 #### Backend
-Java + [Spring](https://spring.io/) + [PostgreSQL](https://www.postgresql.org/)
+Java + [Javalin](https://javalin.io/) + [PostgreSQL](https://www.postgresql.org/)
