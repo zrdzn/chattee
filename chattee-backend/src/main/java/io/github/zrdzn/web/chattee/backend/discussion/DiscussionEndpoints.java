@@ -68,18 +68,17 @@ public class DiscussionEndpoints {
             })
     @Post(ENDPOINT)
     public void createDiscussion(Context context) {
-        context.async(() ->
-                bodyAsClass(context, Discussion.class, "Discussion body is empty or invalid.")
-                        .filter(discussion -> discussion.getTitle() != null, ignored -> badRequest("'title' must not be null."))
-                        .filter(discussion -> discussion.getTitle().length() > 3, ignored -> badRequest("'title' must be longer than 3 characters."))
-                        .filter(discussion -> discussion.getTitle().length() < 31, ignored -> badRequest("'title' must be shorter than 101 characters."))
-                        .filter(discussion -> discussion.getDescription() != null, ignored -> badRequest("'description' must not be null."))
-                        .filter(discussion -> discussion.getDescription().length() > 10, ignored -> badRequest("'description' must be longer than 10 characters."))
-                        .filter(discussion -> discussion.getDescription().length() < 2001, ignored -> badRequest("'description' must be shorter than 2001 characters."))
-                        .filter(discussion -> discussion.getAuthorId() > 0L, ignored -> badRequest("'authorId' must be higher than 0."))
-                        .flatMap(this.discussionService::createDiscussion)
-                        .peek(shop -> context.status(HttpStatus.CREATED).json(created("Discussion has been created.")))
-                        .onError(error -> context.status(error.code()).json(error)));
+        bodyAsClass(context, Discussion.class, "Discussion body is empty or invalid.")
+                .filter(discussion -> discussion.getTitle() != null, ignored -> badRequest("'title' must not be null."))
+                .filter(discussion -> discussion.getTitle().length() > 3, ignored -> badRequest("'title' must be longer than 3 characters."))
+                .filter(discussion -> discussion.getTitle().length() < 31, ignored -> badRequest("'title' must be shorter than 101 characters."))
+                .filter(discussion -> discussion.getDescription() != null, ignored -> badRequest("'description' must not be null."))
+                .filter(discussion -> discussion.getDescription().length() > 10, ignored -> badRequest("'description' must be longer than 10 characters."))
+                .filter(discussion -> discussion.getDescription().length() < 2001, ignored -> badRequest("'description' must be shorter than 2001 characters."))
+                .filter(discussion -> discussion.getAuthorId() > 0L, ignored -> badRequest("'authorId' must be higher than 0."))
+                .flatMap(this.discussionService::createDiscussion)
+                .peek(shop -> context.status(HttpStatus.CREATED).json(created("Discussion has been created.")))
+                .onError(error -> context.status(error.code()).json(error));
     }
 
     @OpenApi(
@@ -110,10 +109,9 @@ public class DiscussionEndpoints {
             })
     @Get(ENDPOINT)
     public void getAllDiscussions(Context context) {
-        context.async(() ->
-                this.discussionService.getAllDiscussions()
-                        .peek(discussions -> context.status(HttpStatus.OK).json(discussions))
-                        .onError(error -> context.status(error.code()).json(error)));
+        this.discussionService.getAllDiscussions()
+                .peek(discussions -> context.status(HttpStatus.OK).json(discussions))
+                .onError(error -> context.status(error.code()).json(error));
     }
 
     @OpenApi(
@@ -154,12 +152,11 @@ public class DiscussionEndpoints {
             })
     @Get(ENDPOINT + "/{id}")
     public void getDiscussion(Context context) {
-        context.async(() ->
-                pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
-                        .flatMap(this.discussionService::getDiscussion)
-                        .peek(discussionMaybe -> discussionMaybe.ifPresentOrElse(discussion -> context.status(HttpStatus.OK).json(discussion),
-                                () -> context.status(HttpStatus.NOT_FOUND).json(notFound("Could not find this discussion."))))
-                        .onError(error -> context.status(error.code()).json(error)));
+        pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
+                .flatMap(this.discussionService::getDiscussion)
+                .peek(discussionMaybe -> discussionMaybe.ifPresentOrElse(discussion -> context.status(HttpStatus.OK).json(discussion),
+                        () -> context.status(HttpStatus.NOT_FOUND).json(notFound("Could not find this discussion."))))
+                .onError(error -> context.status(error.code()).json(error));
     }
 
     @OpenApi(
@@ -195,11 +192,10 @@ public class DiscussionEndpoints {
             })
     @Delete(ENDPOINT + "/{id}")
     public void removeDiscussion(Context context) {
-        context.async(() ->
-                pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
-                        .flatMap(this.discussionService::removeDiscussion)
-                        .peek(ignored -> context.status(HttpStatus.OK).json(ok("Discussion has been removed.")))
-                        .onError(error -> context.status(error.code()).json(error)));
+        pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
+                .flatMap(this.discussionService::removeDiscussion)
+                .peek(ignored -> context.status(HttpStatus.OK).json(ok("Discussion has been removed.")))
+                .onError(error -> context.status(error.code()).json(error));
     }
 
 }

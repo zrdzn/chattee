@@ -1,5 +1,6 @@
 package io.github.zrdzn.web.chattee.backend.account;
 
+import java.util.regex.Pattern;
 import io.github.zrdzn.web.chattee.backend.web.HttpResponse;
 import io.javalin.community.routing.annotations.Delete;
 import io.javalin.community.routing.annotations.Endpoints;
@@ -13,7 +14,6 @@ import io.javalin.openapi.OpenApiContent;
 import io.javalin.openapi.OpenApiParam;
 import io.javalin.openapi.OpenApiRequestBody;
 import io.javalin.openapi.OpenApiResponse;
-import java.util.regex.Pattern;
 
 import static io.github.zrdzn.web.chattee.backend.web.ContextExtensions.bodyAsClass;
 import static io.github.zrdzn.web.chattee.backend.web.ContextExtensions.pathParamAsLong;
@@ -34,6 +34,10 @@ public class AccountEndpoints {
 
     public AccountEndpoints(AccountService accountService) {
         this.accountService = accountService;
+    }
+
+    private static boolean validateEmail(String rawEmail) {
+        return EMAIL_PATTERN.matcher(rawEmail).find();
     }
 
     @OpenApi(
@@ -72,20 +76,19 @@ public class AccountEndpoints {
             })
     @Post(ACCOUNT_ENDPOINT + "/register")
     public void registerAccount(Context context) {
-        context.async(() ->
-                bodyAsClass(context, AccountRegisterDto.class, "Account body is empty or invalid.")
-                        .filter(account -> account.getEmail() != null, ignored -> badRequest("'email' must not be null."))
-                        .filter(account -> validateEmail(account.getEmail()), ignored -> badRequest("'email' is not a valid email."))
-                        .filter(account -> account.getEmail().length() < 65, ignored -> badRequest("'email' must be shorter than 65 characters."))
-                        .filter(account -> account.getRawPassword() != null, ignored -> badRequest("'rawPassword' must not be null."))
-                        .filter(account -> account.getRawPassword().length() > 6, ignored -> badRequest("'rawPassword' must be longer than 6 characters."))
-                        .filter(account -> account.getRawPassword().length() < 81, ignored -> badRequest("'rawPassword' must be shorter than 81 characters."))
-                        .filter(account -> account.getUsername() != null, ignored -> badRequest("'username' must not be null."))
-                        .filter(account -> account.getUsername().length() > 3, ignored -> badRequest("'username' must be longer than 3 characters."))
-                        .filter(account -> account.getUsername().length() < 33, ignored -> badRequest("'username' must be shorter than 33 characters."))
-                        .flatMap(this.accountService::registerAccount)
-                        .peek(ignored -> context.status(HttpStatus.CREATED).json(created("Account has been registered.")))
-                        .onError(error -> context.status(error.code()).json(error)));
+        bodyAsClass(context, AccountRegisterDto.class, "Account body is empty or invalid.")
+                .filter(account -> account.getEmail() != null, ignored -> badRequest("'email' must not be null."))
+                .filter(account -> validateEmail(account.getEmail()), ignored -> badRequest("'email' is not a valid email."))
+                .filter(account -> account.getEmail().length() < 65, ignored -> badRequest("'email' must be shorter than 65 characters."))
+                .filter(account -> account.getRawPassword() != null, ignored -> badRequest("'rawPassword' must not be null."))
+                .filter(account -> account.getRawPassword().length() > 6, ignored -> badRequest("'rawPassword' must be longer than 6 characters."))
+                .filter(account -> account.getRawPassword().length() < 81, ignored -> badRequest("'rawPassword' must be shorter than 81 characters."))
+                .filter(account -> account.getUsername() != null, ignored -> badRequest("'username' must not be null."))
+                .filter(account -> account.getUsername().length() > 3, ignored -> badRequest("'username' must be longer than 3 characters."))
+                .filter(account -> account.getUsername().length() < 33, ignored -> badRequest("'username' must be shorter than 33 characters."))
+                .flatMap(this.accountService::registerAccount)
+                .peek(ignored -> context.status(HttpStatus.CREATED).json(created("Account has been registered.")))
+                .onError(error -> context.status(error.code()).json(error));
     }
 
     @OpenApi(
@@ -116,10 +119,9 @@ public class AccountEndpoints {
             })
     @Get(ACCOUNT_ENDPOINT)
     public void getAllAccounts(Context context) {
-        context.async(() ->
-                this.accountService.getAllAccounts()
-                        .peek(accounts -> context.status(HttpStatus.OK).json(accounts))
-                        .onError(error -> context.status(error.code()).json(error)));
+        this.accountService.getAllAccounts()
+                .peek(accounts -> context.status(HttpStatus.OK).json(accounts))
+                .onError(error -> context.status(error.code()).json(error));
     }
 
     @OpenApi(
@@ -157,11 +159,10 @@ public class AccountEndpoints {
             })
     @Get(PRIVILEGE_ENDPOINT)
     public void getAllPrivileges(Context context) {
-        context.async(() ->
-                pathParamAsLong(context, "accountId", "Specified identifier is not a valid long number.")
-                        .flatMap(this.accountService::getPrivilegesByAccountId)
-                        .peek(privileges -> context.status(HttpStatus.OK).json(privileges))
-                        .onError(error -> context.status(error.code()).json(error)));
+        pathParamAsLong(context, "accountId", "Specified identifier is not a valid long number.")
+                .flatMap(this.accountService::getPrivilegesByAccountId)
+                .peek(privileges -> context.status(HttpStatus.OK).json(privileges))
+                .onError(error -> context.status(error.code()).json(error));
     }
 
     @OpenApi(
@@ -202,12 +203,11 @@ public class AccountEndpoints {
             })
     @Get(ACCOUNT_ENDPOINT + "/{id}")
     public void getAccount(Context context) {
-        context.async(() ->
-                pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
-                        .flatMap(this.accountService::getAccount)
-                        .peek(accountMaybe -> accountMaybe.ifPresentOrElse(account -> context.status(HttpStatus.OK).json(account),
-                                () -> context.status(HttpStatus.NOT_FOUND).json(notFound("Could not find this account."))))
-                        .onError(error -> context.status(error.code()).json(error)));
+        pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
+                .flatMap(this.accountService::getAccount)
+                .peek(accountMaybe -> accountMaybe.ifPresentOrElse(account -> context.status(HttpStatus.OK).json(account),
+                        () -> context.status(HttpStatus.NOT_FOUND).json(notFound("Could not find this account."))))
+                .onError(error -> context.status(error.code()).json(error));
     }
 
     @OpenApi(
@@ -243,15 +243,10 @@ public class AccountEndpoints {
             })
     @Delete(ACCOUNT_ENDPOINT + "/{id}")
     public void removeAccount(Context context) {
-        context.async(() ->
-                pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
-                        .flatMap(this.accountService::removeAccount)
-                        .peek(ignored -> context.status(HttpStatus.OK).json(ok("Account has been removed.")))
-                        .onError(error -> context.status(error.code()).json(error)));
-    }
-
-    private static boolean validateEmail(String rawEmail) {
-        return EMAIL_PATTERN.matcher(rawEmail).find();
+        pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
+                .flatMap(this.accountService::removeAccount)
+                .peek(ignored -> context.status(HttpStatus.OK).json(ok("Account has been removed.")))
+                .onError(error -> context.status(error.code()).json(error));
     }
 
 }

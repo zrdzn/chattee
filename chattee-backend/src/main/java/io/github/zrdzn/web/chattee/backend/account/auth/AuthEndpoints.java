@@ -66,39 +66,38 @@ public class AuthEndpoints {
             })
     @Post(ENDPOINT)
     public void authenticate(Context context) {
-        context.async(() ->
-                bodyAsClass(context, AuthCredentials.class, "Authentication body is empty or invalid.")
-                        .filter(credentials -> credentials.getEmail() != null, ignored -> badRequest("'email' must not be null."))
-                        .filter(credentials -> credentials.getPassword() != null, ignored -> badRequest("'password' must not be null."))
-                        .flatMap(user -> {
-                            Result<Optional<AccountDetailsDto>, HttpResponse> accountResult = this.accountService.getAccount(user.getEmail());
-                            if (accountResult.isErr()) {
-                                return Result.error(badRequest("Account with provided email does not exist."));
-                            }
+        bodyAsClass(context, AuthCredentials.class, "Authentication body is empty or invalid.")
+                .filter(credentials -> credentials.getEmail() != null, ignored -> badRequest("'email' must not be null."))
+                .filter(credentials -> credentials.getPassword() != null, ignored -> badRequest("'password' must not be null."))
+                .flatMap(user -> {
+                    Result<Optional<AccountDetailsDto>, HttpResponse> accountResult = this.accountService.getAccount(user.getEmail());
+                    if (accountResult.isErr()) {
+                        return Result.error(badRequest("Account with provided email does not exist."));
+                    }
 
-                            Optional<AccountDetailsDto> accountMaybe = accountResult.get();
-                            if (accountMaybe.isEmpty()) {
-                                return Result.error(badRequest("Account with provided email does not exist."));
-                            }
+                    Optional<AccountDetailsDto> accountMaybe = accountResult.get();
+                    if (accountMaybe.isEmpty()) {
+                        return Result.error(badRequest("Account with provided email does not exist."));
+                    }
 
-                            AccountDetailsDto foundAccount = accountMaybe.get();
+                    AccountDetailsDto foundAccount = accountMaybe.get();
 
-                            if (!BCrypt.verifyer().verify(user.getPassword().toCharArray(), foundAccount.getPassword().toCharArray()).verified) {
-                                return Result.error(unauthorized("Provided password is invalid."));
-                            }
+                    if (!BCrypt.verifyer().verify(user.getPassword().toCharArray(), foundAccount.getPassword().toCharArray()).verified) {
+                        return Result.error(unauthorized("Provided password is invalid."));
+                    }
 
-                            Session session = new Session(foundAccount.getId(), Instant.now().plus(7, ChronoUnit.DAYS), context.ip());
+                    Session session = new Session(foundAccount.getId(), Instant.now().plus(7, ChronoUnit.DAYS), context.ip());
 
-                            Result<Session, HttpResponse> createSessionResult = this.sessionService.createSession(session);
-                            if (createSessionResult.isErr()) {
-                                return Result.error(unauthorized("Something went wrong while creating a session."));
-                            }
+                    Result<Session, HttpResponse> createSessionResult = this.sessionService.createSession(session);
+                    if (createSessionResult.isErr()) {
+                        return Result.error(unauthorized("Something went wrong while creating a session."));
+                    }
 
-                            return createSessionResult;
-                        }).peek(session -> context.status(HttpStatus.ACCEPTED)
-                                .json(accepted(session.getToken()))
-                                .cachedSessionAttribute("sessionid", session.getToken()))
-                        .onError(error -> context.status(error.code()).json(error)));
+                    return createSessionResult;
+                }).peek(session -> context.status(HttpStatus.ACCEPTED)
+                        .json(accepted(session.getToken()))
+                        .cachedSessionAttribute("sessionid", session.getToken()))
+                .onError(error -> context.status(error.code()).json(error));
     }
 
 }
