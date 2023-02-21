@@ -12,11 +12,9 @@ import io.github.zrdzn.web.chattee.backend.discussion.DiscussionWebConfig;
 import io.github.zrdzn.web.chattee.backend.storage.postgres.PostgresStorage;
 import io.github.zrdzn.web.chattee.backend.account.AccountWebConfig;
 import io.github.zrdzn.web.chattee.backend.account.auth.AuthWebConfig;
-import io.github.zrdzn.web.chattee.backend.account.session.SessionFacade;
 import io.github.zrdzn.web.chattee.backend.account.session.SessionRepository;
 import io.github.zrdzn.web.chattee.backend.account.session.SessionService;
 import io.github.zrdzn.web.chattee.backend.account.session.infrastructure.PostgresSessionRepository;
-import io.github.zrdzn.web.chattee.backend.web.security.token.AccessTokenFacade;
 import io.github.zrdzn.web.chattee.backend.web.security.token.AccessTokenService;
 import io.javalin.Javalin;
 import io.javalin.community.routing.annotations.AnnotationsRoutingPlugin;
@@ -74,10 +72,9 @@ public class HttpServer {
         new DiscussionWebConfig(postgresStorage).initialize(plugin);
 
         SessionRepository sessionRepository = new PostgresSessionRepository(postgresStorage);
-        SessionService sessionService = new SessionService(sessionRepository, new AccessTokenFacade(new AccessTokenService()));
-        SessionFacade sessionFacade = new SessionFacade(sessionService);
+        SessionService sessionService = new SessionService(sessionRepository, new AccessTokenService());
 
-        new AuthWebConfig(accountWebConfig.getUserFacade(), sessionFacade).initialize(plugin);
+        new AuthWebConfig(accountWebConfig.getAccountService(), sessionService).initialize(plugin);
 
         config.plugins.register(plugin);
     }

@@ -26,10 +26,10 @@ public class AccountPrivilegeEndpoints {
 
     public static final String PRIVILEGE_ENDPOINT = "/api/v1/privileges";
 
-    private final AccountFacade accountFacade;
+    private final AccountService accountService;
 
-    public AccountPrivilegeEndpoints(AccountFacade accountFacade) {
-        this.accountFacade = accountFacade;
+    public AccountPrivilegeEndpoints(AccountService accountService) {
+        this.accountService = accountService;
     }
 
     @OpenApi(
@@ -72,7 +72,7 @@ public class AccountPrivilegeEndpoints {
                 bodyAsClass(context, AccountPrivilege.class, "Privilege body is empty or invalid.")
                         .filter(privilege -> privilege.getAccountId() > 0L, ignored -> badRequest("'accountId' must be higher than 0."))
                         .filter(privilege -> privilege.getPrivilege() != null, ignored -> badRequest("'privilege' must not be null."))
-                        .flatMap(this.accountFacade::createPrivilege)
+                        .flatMap(this.accountService::createPrivilege)
                         .peek(ignored -> context.status(HttpStatus.CREATED).json(created("Privilege has been created.")))
                         .onError(error -> context.status(error.code()).json(error)));
     }
@@ -106,7 +106,7 @@ public class AccountPrivilegeEndpoints {
     @Get(PRIVILEGE_ENDPOINT)
     public void getAllPrivileges(Context context) {
         context.async(() ->
-                this.accountFacade.getAllPrivileges()
+                this.accountService.getAllPrivileges()
                         .peek(privileges -> context.status(HttpStatus.OK).json(privileges))
                         .onError(error -> context.status(error.code()).json(error)));
     }
@@ -153,7 +153,7 @@ public class AccountPrivilegeEndpoints {
     public void getPrivilege(Context context) {
         context.async(() ->
                 pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
-                        .flatMap(this.accountFacade::getPrivilege)
+                        .flatMap(this.accountService::getPrivilege)
                         .peek(privilegeMaybe -> privilegeMaybe.ifPresentOrElse(privilege -> context.status(HttpStatus.OK).json(privilege),
                                 () -> context.status(HttpStatus.NOT_FOUND).json(notFound("Could not find a privilege."))))
                         .onError(error -> context.status(error.code()).json(error)));
@@ -196,7 +196,7 @@ public class AccountPrivilegeEndpoints {
     public void removePrivilege(Context context) {
         context.async(() ->
                 pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
-                        .flatMap(this.accountFacade::removePrivilege)
+                        .flatMap(this.accountService::removePrivilege)
                         .peek(ignored -> context.status(HttpStatus.OK).json(ok("Privilege has been removed.")))
                         .onError(error -> context.status(error.code()).json(error)));
     }

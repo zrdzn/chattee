@@ -4,11 +4,10 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import at.favre.lib.crypto.bcrypt.BCrypt;
-import io.github.zrdzn.web.chattee.backend.account.Account;
 import io.github.zrdzn.web.chattee.backend.account.AccountDetailsDto;
-import io.github.zrdzn.web.chattee.backend.account.AccountFacade;
+import io.github.zrdzn.web.chattee.backend.account.AccountService;
 import io.github.zrdzn.web.chattee.backend.account.session.Session;
-import io.github.zrdzn.web.chattee.backend.account.session.SessionFacade;
+import io.github.zrdzn.web.chattee.backend.account.session.SessionService;
 import io.github.zrdzn.web.chattee.backend.web.HttpResponse;
 import io.javalin.community.routing.annotations.Endpoints;
 import io.javalin.community.routing.annotations.Post;
@@ -31,12 +30,12 @@ public class AuthEndpoints {
 
     public static final String ENDPOINT = "/api/v1/auth";
 
-    private final AccountFacade accountFacade;
-    private final SessionFacade sessionFacade;
+    private final AccountService accountService;
+    private final SessionService sessionService;
 
-    public AuthEndpoints(AccountFacade accountFacade, SessionFacade sessionFacade) {
-        this.accountFacade = accountFacade;
-        this.sessionFacade = sessionFacade;
+    public AuthEndpoints(AccountService accountService, SessionService sessionService) {
+        this.accountService = accountService;
+        this.sessionService = sessionService;
     }
 
     @OpenApi(
@@ -72,7 +71,7 @@ public class AuthEndpoints {
                         .filter(credentials -> credentials.getEmail() != null, ignored -> badRequest("'email' must not be null."))
                         .filter(credentials -> credentials.getPassword() != null, ignored -> badRequest("'password' must not be null."))
                         .flatMap(user -> {
-                            Result<Optional<AccountDetailsDto>, HttpResponse> accountResult = this.accountFacade.getAccount(user.getEmail());
+                            Result<Optional<AccountDetailsDto>, HttpResponse> accountResult = this.accountService.getAccount(user.getEmail());
                             if (accountResult.isErr()) {
                                 return Result.error(badRequest("Account with provided email does not exist."));
                             }
@@ -90,7 +89,7 @@ public class AuthEndpoints {
 
                             Session session = new Session(foundAccount.getId(), Instant.now().plus(7, ChronoUnit.DAYS), context.ip());
 
-                            Result<Session, HttpResponse> createSessionResult = this.sessionFacade.createSession(session);
+                            Result<Session, HttpResponse> createSessionResult = this.sessionService.createSession(session);
                             if (createSessionResult.isErr()) {
                                 return Result.error(unauthorized("Something went wrong while creating a session."));
                             }

@@ -17,8 +17,7 @@ public class DiscussionWebConfig implements WebConfig {
     public void initialize(AnnotationsRoutingPlugin plugin) {
         DiscussionRepository discussionRepository = new PostgresDiscussionRepository(this.postgresStorage);
         DiscussionService discussionService = new DiscussionService(discussionRepository);
-        DiscussionFacade discussionFacade = new DiscussionFacade(discussionService);
-        DiscussionEndpoints discussionEndpoints = new DiscussionEndpoints(discussionFacade);
+        DiscussionEndpoints discussionEndpoints = new DiscussionEndpoints(discussionService);
 
         plugin.registerEndpoints(discussionEndpoints);
     }

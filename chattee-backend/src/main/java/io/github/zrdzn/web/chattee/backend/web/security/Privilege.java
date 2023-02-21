@@ -6,6 +6,10 @@ public enum Privilege implements RouteRole {
 
     GUEST,
 
-    DISCUSSION_OPEN
+    DISCUSSION_OPEN,
+
+    ACCOUNT_REMOVE,
+
+    ACCOUNT_REMOVE_OTHERS
 
 }

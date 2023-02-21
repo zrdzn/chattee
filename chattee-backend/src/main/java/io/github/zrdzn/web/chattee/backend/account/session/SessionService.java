@@ -4,7 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 import io.github.zrdzn.web.chattee.backend.web.HttpResponse;
-import io.github.zrdzn.web.chattee.backend.web.security.token.AccessTokenFacade;
+import io.github.zrdzn.web.chattee.backend.web.security.token.AccessTokenService;
 import org.postgresql.util.PSQLState;
 import org.tinylog.Logger;
 import panda.std.Blank;
@@ -16,16 +16,16 @@ import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.internalServe
 public class SessionService {
 
     private final SessionRepository sessionRepository;
-    private final AccessTokenFacade accessTokenFacade;
+    private final AccessTokenService accessTokenService;
 
-    public SessionService(SessionRepository sessionRepository, AccessTokenFacade accessTokenFacade) {
+    public SessionService(SessionRepository sessionRepository, AccessTokenService accessTokenService) {
         this.sessionRepository = sessionRepository;
-        this.accessTokenFacade = accessTokenFacade;
+        this.accessTokenService = accessTokenService;
     }
 
     public Result<Session, HttpResponse> createSession(Session session) {
         if (session.getToken() == null) {
-            session.setToken(this.accessTokenFacade.createToken());
+            session.setToken(this.accessTokenService.createToken());
         }
 
         return this.sessionRepository.saveSession(session)

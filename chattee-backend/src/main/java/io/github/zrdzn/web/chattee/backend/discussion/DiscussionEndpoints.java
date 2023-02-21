@@ -26,10 +26,10 @@ public class DiscussionEndpoints {
 
     public static final String ENDPOINT = "/api/v1/discussions";
 
-    private final DiscussionFacade discussionFacade;
+    private final DiscussionService discussionService;
 
-    public DiscussionEndpoints(DiscussionFacade discussionFacade) {
-        this.discussionFacade = discussionFacade;
+    public DiscussionEndpoints(DiscussionService discussionService) {
+        this.discussionService = discussionService;
     }
 
     @OpenApi(
@@ -77,7 +77,7 @@ public class DiscussionEndpoints {
                         .filter(discussion -> discussion.getDescription().length() > 10, ignored -> badRequest("'description' must be longer than 10 characters."))
                         .filter(discussion -> discussion.getDescription().length() < 2001, ignored -> badRequest("'description' must be shorter than 2001 characters."))
                         .filter(discussion -> discussion.getAuthorId() > 0L, ignored -> badRequest("'authorId' must be higher than 0."))
-                        .flatMap(this.discussionFacade::createDiscussion)
+                        .flatMap(this.discussionService::createDiscussion)
                         .peek(shop -> context.status(HttpStatus.CREATED).json(created("Discussion has been created.")))
                         .onError(error -> context.status(error.code()).json(error)));
     }
@@ -111,7 +111,7 @@ public class DiscussionEndpoints {
     @Get(ENDPOINT)
     public void getAllDiscussions(Context context) {
         context.async(() ->
-                this.discussionFacade.getAllDiscussions()
+                this.discussionService.getAllDiscussions()
                         .peek(discussions -> context.status(HttpStatus.OK).json(discussions))
                         .onError(error -> context.status(error.code()).json(error)));
     }
@@ -156,7 +156,7 @@ public class DiscussionEndpoints {
     public void getDiscussion(Context context) {
         context.async(() ->
                 pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
-                        .flatMap(this.discussionFacade::getDiscussion)
+                        .flatMap(this.discussionService::getDiscussion)
                         .peek(discussionMaybe -> discussionMaybe.ifPresentOrElse(discussion -> context.status(HttpStatus.OK).json(discussion),
                                 () -> context.status(HttpStatus.NOT_FOUND).json(notFound("Could not find this discussion."))))
                         .onError(error -> context.status(error.code()).json(error)));
@@ -197,7 +197,7 @@ public class DiscussionEndpoints {
     public void removeDiscussion(Context context) {
         context.async(() ->
                 pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
-                        .flatMap(this.discussionFacade::removeDiscussion)
+                        .flatMap(this.discussionService::removeDiscussion)
                         .peek(ignored -> context.status(HttpStatus.OK).json(ok("Discussion has been removed.")))
                         .onError(error -> context.status(error.code()).json(error)));
     }

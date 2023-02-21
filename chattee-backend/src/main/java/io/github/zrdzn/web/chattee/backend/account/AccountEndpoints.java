@@ -30,10 +30,10 @@ public class AccountEndpoints {
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Z\\d._%+-]+@[A-Z\\d.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
 
-    private final AccountFacade accountFacade;
+    private final AccountService accountService;
 
-    public AccountEndpoints(AccountFacade accountFacade) {
-        this.accountFacade = accountFacade;
+    public AccountEndpoints(AccountService accountService) {
+        this.accountService = accountService;
     }
 
     @OpenApi(
@@ -83,7 +83,7 @@ public class AccountEndpoints {
                         .filter(account -> account.getUsername() != null, ignored -> badRequest("'username' must not be null."))
                         .filter(account -> account.getUsername().length() > 3, ignored -> badRequest("'username' must be longer than 3 characters."))
                         .filter(account -> account.getUsername().length() < 33, ignored -> badRequest("'username' must be shorter than 33 characters."))
-                        .flatMap(this.accountFacade::registerAccount)
+                        .flatMap(this.accountService::registerAccount)
                         .peek(ignored -> context.status(HttpStatus.CREATED).json(created("Account has been registered.")))
                         .onError(error -> context.status(error.code()).json(error)));
     }
@@ -117,7 +117,7 @@ public class AccountEndpoints {
     @Get(ACCOUNT_ENDPOINT)
     public void getAllAccounts(Context context) {
         context.async(() ->
-                this.accountFacade.getAllAccounts()
+                this.accountService.getAllAccounts()
                         .peek(accounts -> context.status(HttpStatus.OK).json(accounts))
                         .onError(error -> context.status(error.code()).json(error)));
     }
@@ -159,7 +159,7 @@ public class AccountEndpoints {
     public void getAllPrivileges(Context context) {
         context.async(() ->
                 pathParamAsLong(context, "accountId", "Specified identifier is not a valid long number.")
-                        .flatMap(this.accountFacade::getPrivilegesByAccountId)
+                        .flatMap(this.accountService::getPrivilegesByAccountId)
                         .peek(privileges -> context.status(HttpStatus.OK).json(privileges))
                         .onError(error -> context.status(error.code()).json(error)));
     }
@@ -204,7 +204,7 @@ public class AccountEndpoints {
     public void getAccount(Context context) {
         context.async(() ->
                 pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
-                        .flatMap(this.accountFacade::getAccount)
+                        .flatMap(this.accountService::getAccount)
                         .peek(accountMaybe -> accountMaybe.ifPresentOrElse(account -> context.status(HttpStatus.OK).json(account),
                                 () -> context.status(HttpStatus.NOT_FOUND).json(notFound("Could not find this account."))))
                         .onError(error -> context.status(error.code()).json(error)));
@@ -245,7 +245,7 @@ public class AccountEndpoints {
     public void removeAccount(Context context) {
         context.async(() ->
                 pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
-                        .flatMap(this.accountFacade::removeAccount)
+                        .flatMap(this.accountService::removeAccount)
                         .peek(ignored -> context.status(HttpStatus.OK).json(ok("Account has been removed.")))
                         .onError(error -> context.status(error.code()).json(error)));
     }

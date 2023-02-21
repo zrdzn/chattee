@@ -9,7 +9,7 @@ public class AccountWebConfig implements WebConfig {
 
     private final PostgresStorage postgresStorage;
 
-    private AccountFacade accountFacade;
+    private AccountService accountService;
 
     public AccountWebConfig(PostgresStorage postgresStorage) {
         this.postgresStorage = postgresStorage;
@@ -18,18 +18,17 @@ public class AccountWebConfig implements WebConfig {
     @Override
     public void initialize(AnnotationsRoutingPlugin plugin) {
         AccountRepository accountRepository = new PostgresAccountRepository(this.postgresStorage);
-        AccountService accountService = new AccountService(accountRepository);
-        this.accountFacade = new AccountFacade(accountService);
+        this.accountService = new AccountService(accountRepository);
 
-        AccountEndpoints accountEndpoints = new AccountEndpoints(this.accountFacade);
-        AccountPrivilegeEndpoints accountPrivilegeEndpoints = new AccountPrivilegeEndpoints(this.accountFacade);
+        AccountEndpoints accountEndpoints = new AccountEndpoints(this.accountService);
+        AccountPrivilegeEndpoints accountPrivilegeEndpoints = new AccountPrivilegeEndpoints(this.accountService);
 
         plugin.registerEndpoints(accountEndpoints);
         plugin.registerEndpoints(accountPrivilegeEndpoints);
     }
 
-    public AccountFacade getUserFacade() {
-        return this.accountFacade;
+    public AccountService getAccountService() {
+        return this.accountService;
     }
 
 }
