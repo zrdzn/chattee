@@ -1,18 +1,18 @@
 package io.github.zrdzn.web.chattee.backend.discussion;
 
 import java.util.List;
-import java.util.Optional;
+import io.github.zrdzn.web.chattee.backend.shared.DomainError;
 import panda.std.Blank;
 import panda.std.Result;
 
 public interface DiscussionRepository {
 
-    Result<Discussion, Exception> saveDiscussion(Discussion discussion);
+    Result<Discussion, DomainError> saveDiscussion(Discussion discussion);
 
-    Result<List<Discussion>, Exception> listAllDiscussions();
+    Result<List<Discussion>, DomainError> listAllDiscussions();
 
-    Result<Optional<Discussion>, Exception> findDiscussionById(long id);
+    Result<Discussion, DomainError> findDiscussionById(long id);
 
-    Result<Blank, Exception> deleteDiscussion(long id);
+    Result<Blank, DomainError> deleteDiscussion(long id);
 
 }

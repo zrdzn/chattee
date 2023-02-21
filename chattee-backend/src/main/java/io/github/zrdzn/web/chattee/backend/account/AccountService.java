@@ -1,18 +1,17 @@
 package io.github.zrdzn.web.chattee.backend.account;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
-import java.sql.SQLException;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
+import io.github.zrdzn.web.chattee.backend.shared.DomainError;
 import io.github.zrdzn.web.chattee.backend.web.HttpResponse;
-import org.postgresql.util.PSQLState;
-import org.tinylog.Logger;
 import panda.std.Blank;
 import panda.std.Result;
 
 import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.badRequest;
+import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.conflict;
 import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.internalServerError;
+import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.notFound;
 
 public class AccountService {
 
@@ -28,26 +27,20 @@ public class AccountService {
 
         return this.accountRepository.saveAccount(account)
                 .map(AccountDetailsDto::new)
-                .onError(error -> Logger.error(error, "Could not save the account."))
-                .mapErr(error -> internalServerError("Could not create the account."));
+                .mapErr(error -> {
+                    if (error == DomainError.ACCOUNT_ALREADY_EXISTS) {
+                        return conflict("Account already exists.");
+                    }
+
+                    return internalServerError("Could not create account.");
+                });
     }
 
     public Result<AccountPrivilege, HttpResponse> createPrivilege(AccountPrivilege privilege) {
         return this.accountRepository.savePrivilege(privilege)
-                .onError(error -> {
-                    if (error instanceof SQLException sqlException) {
-                        if (sqlException.getSQLState().equalsIgnoreCase(PSQLState.FOREIGN_KEY_VIOLATION.getState())) {
-                            return;
-                        }
-                    }
-
-                    Logger.error(error, "Could not save the privilege.");
-                })
                 .mapErr(error -> {
-                    if (error instanceof SQLException sqlException) {
-                        if (sqlException.getSQLState().equalsIgnoreCase(PSQLState.FOREIGN_KEY_VIOLATION.getState())) {
-                            return badRequest("'accountId' does not target an existing record.");
-                        }
+                    if (error == DomainError.ACCOUNT_INVALID_ID) {
+                        return badRequest("'accountId' does not target existing record.");
                     }
 
                     return internalServerError("Could not create the privilege.");
@@ -57,52 +50,62 @@ public class AccountService {
     public Result<List<AccountDetailsDto>, HttpResponse> getAllAccounts() {
         return this.accountRepository.listAllAccounts()
                 .map(accounts -> accounts.stream().map(AccountDetailsDto::new).collect(Collectors.toList()))
-                .onError(error -> Logger.error(error, "Could not list all accounts."))
                 .mapErr(error -> internalServerError("Could not retrieve all accounts."));
     }
 
     public Result<List<AccountPrivilege>, HttpResponse> getAllPrivileges() {
         return this.accountRepository.listAllPrivileges()
-                .onError(error -> Logger.error(error, "Could not list all privileges."))
                 .mapErr(error -> internalServerError("Could not retrieve all privileges."));
     }
 
     public Result<List<AccountPrivilege>, HttpResponse> getPrivilegesByAccountId(long id) {
         return this.accountRepository.findPrivilegesByAccountId(id)
-                .onError(error -> Logger.error(error, "Could not find privileges."))
                 .mapErr(error -> internalServerError("Could not retrieve privileges."));
     }
 
-    public Result<Optional<AccountDetailsDto>, HttpResponse> getAccount(long id) {
+    public Result<AccountDetailsDto, HttpResponse> getAccount(long id) {
         return this.accountRepository.findAccountById(id)
-                .map(account -> account.map(AccountDetailsDto::new))
-                .onError(error -> Logger.error(error, "Could not find an account."))
-                .mapErr(error -> internalServerError("Could not retrieve an account."));
+                .map(AccountDetailsDto::new)
+                .mapErr(error -> {
+                    if (error == DomainError.ACCOUNT_NOT_EXISTS) {
+                        notFound("Account does not exist.");
+                    }
+
+                    return internalServerError("Could not retrieve account.");
+                });
     }
 
-    public Result<Optional<AccountDetailsDto>, HttpResponse> getAccount(String email) {
+    public Result<AccountDetailsDto, HttpResponse> getAccount(String email) {
         return this.accountRepository.findAccountByEmail(email)
-                .map(account -> account.map(AccountDetailsDto::new))
-                .onError(error -> Logger.error(error, "Could not find an account."))
-                .mapErr(error -> internalServerError("Could not retrieve an account."));
+                .map(AccountDetailsDto::new)
+                .mapErr(error -> {
+                    if (error == DomainError.ACCOUNT_NOT_EXISTS) {
+                        notFound("Account does not exist.");
+                    }
+
+                    return internalServerError("Could not retrieve account.");
+                });
     }
 
-    public Result<Optional<AccountPrivilege>, HttpResponse> getPrivilege(long id) {
+    public Result<AccountPrivilege, HttpResponse> getPrivilege(long id) {
         return this.accountRepository.findPrivilegeById(id)
-                .onError(error -> Logger.error(error, "Could not find a privilege."))
-                .mapErr(error -> internalServerError("Could not retrieve a privilege."));
+                .mapErr(error -> {
+                    if (error == DomainError.ACCOUNT_PRIVILEGE_NOT_EXISTS) {
+                        notFound("Account privilege does not exist.");
+                    }
+
+                    return internalServerError("Could not retrieve privilege.");
+                });
     }
 
     public Result<Blank, HttpResponse> removeAccount(long id) {
         return this.accountRepository.deleteAccount(id)
-                .onError(error -> Logger.error(error, "Could not delete an account."))
-                .mapErr(error -> internalServerError("Could not remove an account."));
+                .mapErr(error -> internalServerError("Could not remove account."));
     }
 
     public Result<Blank, HttpResponse> removePrivilege(long id) {
         return this.accountRepository.deletePrivilege(id)
-                .onError(error -> Logger.error(error, "Could not delete a privilege."))
-                .mapErr(error -> internalServerError("Could not remove a privilege."));
+                .mapErr(error -> internalServerError("Could not remove privilege."));
     }
 
 }

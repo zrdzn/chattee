@@ -2,7 +2,6 @@ package io.github.zrdzn.web.chattee.backend.account.auth;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Optional;
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import io.github.zrdzn.web.chattee.backend.account.AccountDetailsDto;
 import io.github.zrdzn.web.chattee.backend.account.AccountService;
@@ -69,28 +68,23 @@ public class AuthEndpoints {
         bodyAsClass(context, AuthCredentials.class, "Authentication body is empty or invalid.")
                 .filter(credentials -> credentials.getEmail() != null, ignored -> badRequest("'email' must not be null."))
                 .filter(credentials -> credentials.getPassword() != null, ignored -> badRequest("'password' must not be null."))
-                .flatMap(user -> {
-                    Result<Optional<AccountDetailsDto>, HttpResponse> accountResult = this.accountService.getAccount(user.getEmail());
-                    if (accountResult.isErr()) {
-                        return Result.error(badRequest("Account with provided email does not exist."));
+                .flatMap(credentials -> {
+                    Result<AccountDetailsDto, HttpResponse> accountMaybe = this.accountService.getAccount(credentials.getEmail());
+                    if (accountMaybe.isErr()) {
+                        return Result.error(accountMaybe.getError());
                     }
 
-                    Optional<AccountDetailsDto> accountMaybe = accountResult.get();
-                    if (accountMaybe.isEmpty()) {
-                        return Result.error(badRequest("Account with provided email does not exist."));
-                    }
+                    AccountDetailsDto account = accountMaybe.get();
 
-                    AccountDetailsDto foundAccount = accountMaybe.get();
-
-                    if (!BCrypt.verifyer().verify(user.getPassword().toCharArray(), foundAccount.getPassword().toCharArray()).verified) {
+                    if (!BCrypt.verifyer().verify(credentials.getPassword().toCharArray(), account.getPassword().toCharArray()).verified) {
                         return Result.error(unauthorized("Provided password is invalid."));
                     }
 
-                    Session session = new Session(foundAccount.getId(), Instant.now().plus(7, ChronoUnit.DAYS), context.ip());
+                    Session session = new Session(account.getId(), Instant.now().plus(7, ChronoUnit.DAYS), context.ip());
 
                     Result<Session, HttpResponse> createSessionResult = this.sessionService.createSession(session);
                     if (createSessionResult.isErr()) {
-                        return Result.error(unauthorized("Something went wrong while creating a session."));
+                        return Result.error(unauthorized(createSessionResult.getError().message()));
                     }
 
                     return createSessionResult;

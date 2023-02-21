@@ -18,8 +18,6 @@ import io.javalin.openapi.OpenApiResponse;
 import static io.github.zrdzn.web.chattee.backend.web.ContextExtensions.bodyAsClass;
 import static io.github.zrdzn.web.chattee.backend.web.ContextExtensions.pathParamAsLong;
 import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.badRequest;
-import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.created;
-import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.notFound;
 import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.ok;
 
 @Endpoints
@@ -87,7 +85,7 @@ public class AccountEndpoints {
                 .filter(account -> account.getUsername().length() > 3, ignored -> badRequest("'username' must be longer than 3 characters."))
                 .filter(account -> account.getUsername().length() < 33, ignored -> badRequest("'username' must be shorter than 33 characters."))
                 .flatMap(this.accountService::registerAccount)
-                .peek(ignored -> context.status(HttpStatus.CREATED).json(created("Account has been registered.")))
+                .peek(accountDetails -> context.status(HttpStatus.CREATED).json(accountDetails))
                 .onError(error -> context.status(error.code()).json(error));
     }
 
@@ -205,8 +203,7 @@ public class AccountEndpoints {
     public void getAccount(Context context) {
         pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
                 .flatMap(this.accountService::getAccount)
-                .peek(accountMaybe -> accountMaybe.ifPresentOrElse(account -> context.status(HttpStatus.OK).json(account),
-                        () -> context.status(HttpStatus.NOT_FOUND).json(notFound("Could not find this account."))))
+                .peek(accountDetails -> context.status(HttpStatus.OK).json(accountDetails))
                 .onError(error -> context.status(error.code()).json(error));
     }
 

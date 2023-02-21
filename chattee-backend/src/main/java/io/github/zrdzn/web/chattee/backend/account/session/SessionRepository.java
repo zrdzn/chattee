@@ -1,18 +1,18 @@
 package io.github.zrdzn.web.chattee.backend.account.session;
 
 import java.util.List;
-import java.util.Optional;
+import io.github.zrdzn.web.chattee.backend.shared.DomainError;
 import panda.std.Blank;
 import panda.std.Result;
 
 public interface SessionRepository {
 
-    Result<Session, Exception> saveSession(Session session);
+    Result<Session, DomainError> saveSession(Session session);
 
-    Result<List<Session>, Exception> listAllSessions();
+    Result<List<Session>, DomainError> listAllSessions();
 
-    Result<Optional<Session>, Exception> findSessionByToken(String token);
+    Result<Session, DomainError> findSessionByToken(String token);
 
-    Result<Blank, Exception> deleteSessionByToken(String token);
+    Result<Blank, DomainError> deleteSessionByToken(String token);
 
 }

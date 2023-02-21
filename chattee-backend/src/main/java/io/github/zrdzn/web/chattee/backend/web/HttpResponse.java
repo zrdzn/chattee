@@ -35,6 +35,10 @@ public record HttpResponse(
         return new HttpResponse(HttpStatus.NOT_FOUND, message);
     }
 
+    public static HttpResponse conflict(String message) {
+        return new HttpResponse(HttpStatus.CONFLICT, message);
+    }
+
     public static HttpResponse internalServerError(String message) {
         return new HttpResponse(HttpStatus.INTERNAL_SERVER_ERROR, message);
     }

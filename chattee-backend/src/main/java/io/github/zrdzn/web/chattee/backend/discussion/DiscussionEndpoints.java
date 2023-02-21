@@ -18,7 +18,6 @@ import static io.github.zrdzn.web.chattee.backend.web.ContextExtensions.bodyAsCl
 import static io.github.zrdzn.web.chattee.backend.web.ContextExtensions.pathParamAsLong;
 import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.badRequest;
 import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.created;
-import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.notFound;
 import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.ok;
 
 @Endpoints
@@ -154,8 +153,7 @@ public class DiscussionEndpoints {
     public void getDiscussion(Context context) {
         pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
                 .flatMap(this.discussionService::getDiscussion)
-                .peek(discussionMaybe -> discussionMaybe.ifPresentOrElse(discussion -> context.status(HttpStatus.OK).json(discussion),
-                        () -> context.status(HttpStatus.NOT_FOUND).json(notFound("Could not find this discussion."))))
+                .peek(discussion -> context.status(HttpStatus.OK).json(discussion))
                 .onError(error -> context.status(error.code()).json(error));
     }
 

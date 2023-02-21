@@ -1,30 +1,30 @@
 package io.github.zrdzn.web.chattee.backend.account;
 
 import java.util.List;
-import java.util.Optional;
+import io.github.zrdzn.web.chattee.backend.shared.DomainError;
 import panda.std.Blank;
 import panda.std.Result;
 
 public interface AccountRepository {
 
-    Result<Account, Exception> saveAccount(Account account);
+    Result<Account, DomainError> saveAccount(Account account);
 
-    Result<AccountPrivilege, Exception> savePrivilege(AccountPrivilege privilege);
+    Result<AccountPrivilege, DomainError> savePrivilege(AccountPrivilege privilege);
 
-    Result<List<Account>, Exception> listAllAccounts();
+    Result<List<Account>, DomainError> listAllAccounts();
 
-    Result<List<AccountPrivilege>, Exception> listAllPrivileges();
+    Result<List<AccountPrivilege>, DomainError> listAllPrivileges();
 
-    Result<Optional<Account>, Exception> findAccountById(long id);
+    Result<Account, DomainError> findAccountById(long id);
 
-    Result<Optional<Account>, Exception> findAccountByEmail(String email);
+    Result<Account, DomainError> findAccountByEmail(String email);
 
-    Result<Optional<AccountPrivilege>, Exception> findPrivilegeById(long id);
+    Result<AccountPrivilege, DomainError> findPrivilegeById(long id);
 
-    Result<List<AccountPrivilege>, Exception> findPrivilegesByAccountId(long id);
+    Result<List<AccountPrivilege>, DomainError> findPrivilegesByAccountId(long id);
 
-    Result<Blank, Exception> deleteAccount(long id);
+    Result<Blank, DomainError> deleteAccount(long id);
 
-    Result<Blank, Exception> deletePrivilege(long id);
+    Result<Blank, DomainError> deletePrivilege(long id);
 
 }
