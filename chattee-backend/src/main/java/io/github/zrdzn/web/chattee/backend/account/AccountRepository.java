@@ -13,13 +13,9 @@ public interface AccountRepository {
 
     Result<List<Account>, DomainError> listAllAccounts();
 
-    Result<List<AccountPrivilege>, DomainError> listAllPrivileges();
-
     Result<Account, DomainError> findAccountById(long id);
 
     Result<Account, DomainError> findAccountByEmail(String email);
-
-    Result<AccountPrivilege, DomainError> findPrivilegeById(long id);
 
     Result<List<AccountPrivilege>, DomainError> findPrivilegesByAccountId(long id);
 

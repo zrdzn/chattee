@@ -24,11 +24,9 @@ public class PostgresAccountRepository implements AccountRepository {
     private static final String INSERT_PRIVILEGE = "insert into accounts_privileges (account_id, privilege) values (?, ?);";
 
     private static final String SELECT_ALL_ACCOUNTS = "select id, email, password, username, created_at, updated_at from accounts;";
-    private static final String SELECT_ALL_PRIVILEGES = "select id, account_id, privilege from accounts_privileges;";
 
     private static final String SELECT_ACCOUNT_BY_ID = "select email, password, username, created_at, updated_at from accounts where id = ?;";
     private static final String SELECT_ACCOUNT_BY_EMAIL = "select id, password, username, created_at, updated_at from accounts where email = ?;";
-    private static final String SELECT_PRIVILEGE_BY_ID = "select account_id, privilege from accounts_privileges where id = ?;";
     private static final String SELECT_PRIVILEGE_BY_ACCOUNT_ID = "select id, privilege from accounts_privileges where account_id = ?;";
 
     private static final String DELETE_ACCOUNT_BY_ID = "delete from accounts where id = ?;";
@@ -110,28 +108,6 @@ public class PostgresAccountRepository implements AccountRepository {
     }
 
     @Override
-    public Result<List<AccountPrivilege>, DomainError> listAllPrivileges() {
-        try (Connection connection = this.postgresStorage.getHikariDataSource().getConnection();
-             PreparedStatement statement = connection.prepareStatement(SELECT_ALL_PRIVILEGES)) {
-            List<AccountPrivilege> privileges = new ArrayList<>();
-
-            ResultSet result = statement.executeQuery();
-            while (result.next()) {
-                long id = result.getLong("id");
-                long accountId = result.getLong("account_id");
-                Privilege privilege = Privilege.valueOf(result.getString("privilege"));
-
-                privileges.add(new AccountPrivilege(id, accountId, privilege));
-            }
-
-            return Result.ok(privileges);
-        } catch (SQLException exception) {
-            Logger.error(exception, "Could not list all privileges.");
-            return Result.error(DomainError.SQL_EXCEPTION);
-        }
-    }
-
-    @Override
     public Result<Account, DomainError> findAccountById(long id) {
         try (Connection connection = this.postgresStorage.getHikariDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(SELECT_ACCOUNT_BY_ID)) {
@@ -173,26 +149,6 @@ public class PostgresAccountRepository implements AccountRepository {
             return Result.ok(new Account(id, email, password, username, createdAt, updatedAt));
         } catch (SQLException exception) {
             Logger.error(exception, "Could not find account.");
-            return Result.error(DomainError.SQL_EXCEPTION);
-        }
-    }
-
-    @Override
-    public Result<AccountPrivilege, DomainError> findPrivilegeById(long id) {
-        try (Connection connection = this.postgresStorage.getHikariDataSource().getConnection();
-             PreparedStatement statement = connection.prepareStatement(SELECT_PRIVILEGE_BY_ID)) {
-            statement.setLong(1, id);
-            ResultSet result = statement.executeQuery();
-            if (!result.next()) {
-                return Result.error(DomainError.ACCOUNT_PRIVILEGE_NOT_EXISTS);
-            }
-
-            long accountId = result.getLong("account_id");
-            Privilege privilege = Privilege.valueOf(result.getString("privilege"));
-
-            return Result.ok(new AccountPrivilege(id, accountId, privilege));
-        } catch (SQLException exception) {
-            Logger.error(exception, "Could not find privilege.");
             return Result.error(DomainError.SQL_EXCEPTION);
         }
     }

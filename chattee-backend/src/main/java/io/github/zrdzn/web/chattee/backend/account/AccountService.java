@@ -53,11 +53,6 @@ public class AccountService {
                 .mapErr(error -> internalServerError("Could not retrieve all accounts."));
     }
 
-    public Result<List<AccountPrivilege>, HttpResponse> getAllPrivileges() {
-        return this.accountRepository.listAllPrivileges()
-                .mapErr(error -> internalServerError("Could not retrieve all privileges."));
-    }
-
     public Result<List<AccountPrivilege>, HttpResponse> getPrivilegesByAccountId(long id) {
         return this.accountRepository.findPrivilegesByAccountId(id)
                 .mapErr(error -> internalServerError("Could not retrieve privileges."));
@@ -84,17 +79,6 @@ public class AccountService {
                     }
 
                     return internalServerError("Could not retrieve account.");
-                });
-    }
-
-    public Result<AccountPrivilege, HttpResponse> getPrivilege(long id) {
-        return this.accountRepository.findPrivilegeById(id)
-                .mapErr(error -> {
-                    if (error == DomainError.ACCOUNT_PRIVILEGE_NOT_EXISTS) {
-                        notFound("Account privilege does not exist.");
-                    }
-
-                    return internalServerError("Could not retrieve privilege.");
                 });
     }
 
