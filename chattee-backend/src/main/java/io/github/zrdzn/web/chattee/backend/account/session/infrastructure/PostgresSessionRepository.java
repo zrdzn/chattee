@@ -67,7 +67,7 @@ public class PostgresSessionRepository implements SessionRepository {
             ResultSet result = statement.executeQuery();
             while (result.next()) {
                 String token = result.getString("token");
-                long userId = result.getLong("user_id");
+                long userId = result.getLong("account_id");
                 Instant expireAt = result.getTimestamp("expire_at").toInstant();
                 Instant createdAt = result.getTimestamp("created_at").toInstant();
                 String ipAddress = result.getString("ip_address");
@@ -92,7 +92,7 @@ public class PostgresSessionRepository implements SessionRepository {
                 return Result.error(DomainError.SESSION_NOT_EXISTS);
             }
 
-            long userId = result.getLong("user_id");
+            long userId = result.getLong("account_id");
             Instant expireAt = result.getTimestamp("expire_at").toInstant();
             Instant createdAt = result.getTimestamp("created_at").toInstant();
             String ipAddress = result.getString("ip_address");
