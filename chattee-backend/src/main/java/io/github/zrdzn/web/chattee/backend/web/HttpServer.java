@@ -8,6 +8,8 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.github.zrdzn.web.chattee.backend.ChatteeConfig;
+import io.github.zrdzn.web.chattee.backend.account.AccountService;
+import io.github.zrdzn.web.chattee.backend.account.auth.AuthService;
 import io.github.zrdzn.web.chattee.backend.discussion.DiscussionWebConfig;
 import io.github.zrdzn.web.chattee.backend.storage.postgres.PostgresStorage;
 import io.github.zrdzn.web.chattee.backend.account.AccountWebConfig;
@@ -68,11 +70,14 @@ public class HttpServer {
 
         AccountWebConfig accountWebConfig = new AccountWebConfig(postgresStorage);
         accountWebConfig.initialize(plugin);
-
-        new DiscussionWebConfig(postgresStorage).initialize(plugin);
+        AccountService accountService = accountWebConfig.getAccountService();
 
         SessionRepository sessionRepository = new PostgresSessionRepository(postgresStorage);
         SessionService sessionService = new SessionService(sessionRepository, new AccessTokenService());
+
+        AuthService authService = new AuthService(sessionService, accountService);
+
+        new DiscussionWebConfig(postgresStorage, authService).initialize(plugin);
 
         new AuthWebConfig(accountWebConfig.getAccountService(), sessionService).initialize(plugin);
 

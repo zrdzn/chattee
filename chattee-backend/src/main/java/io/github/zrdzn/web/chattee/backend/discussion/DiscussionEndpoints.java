@@ -1,6 +1,8 @@
 package io.github.zrdzn.web.chattee.backend.discussion;
 
+import io.github.zrdzn.web.chattee.backend.account.auth.AuthService;
 import io.github.zrdzn.web.chattee.backend.web.HttpResponse;
+import io.github.zrdzn.web.chattee.backend.web.security.Privilege;
 import io.javalin.community.routing.annotations.Delete;
 import io.javalin.community.routing.annotations.Endpoints;
 import io.javalin.community.routing.annotations.Get;
@@ -26,9 +28,11 @@ public class DiscussionEndpoints {
     public static final String ENDPOINT = "/api/v1/discussions";
 
     private final DiscussionService discussionService;
+    private final AuthService authService;
 
-    public DiscussionEndpoints(DiscussionService discussionService) {
+    public DiscussionEndpoints(DiscussionService discussionService, AuthService authService) {
         this.discussionService = discussionService;
+        this.authService = authService;
     }
 
     @OpenApi(
@@ -67,16 +71,20 @@ public class DiscussionEndpoints {
             })
     @Post(ENDPOINT)
     public void createDiscussion(Context context) {
-        bodyAsClass(context, Discussion.class, "Discussion body is empty or invalid.")
-                .filter(discussion -> discussion.getTitle() != null, ignored -> badRequest("'title' must not be null."))
-                .filter(discussion -> discussion.getTitle().length() > 3, ignored -> badRequest("'title' must be longer than 3 characters."))
-                .filter(discussion -> discussion.getTitle().length() < 31, ignored -> badRequest("'title' must be shorter than 101 characters."))
-                .filter(discussion -> discussion.getDescription() != null, ignored -> badRequest("'description' must not be null."))
-                .filter(discussion -> discussion.getDescription().length() > 10, ignored -> badRequest("'description' must be longer than 10 characters."))
-                .filter(discussion -> discussion.getDescription().length() < 2001, ignored -> badRequest("'description' must be shorter than 2001 characters."))
-                .filter(discussion -> discussion.getAuthorId() > 0L, ignored -> badRequest("'authorId' must be higher than 0."))
-                .flatMap(this.discussionService::createDiscussion)
-                .peek(shop -> context.status(HttpStatus.CREATED).json(created("Discussion has been created.")))
+        this.authService.authorizeFor(context, Privilege.DISCUSSION_OPEN)
+                .peek(session -> bodyAsClass(context, Discussion.class, "Discussion body is empty or invalid.")
+                        .filter(discussion -> discussion.getTitle() != null, ignored -> badRequest("'title' must not be null."))
+                        .filter(discussion -> discussion.getTitle().length() > 3, ignored -> badRequest("'title' must be longer than 3 characters."))
+                        .filter(discussion -> discussion.getTitle().length() < 31, ignored -> badRequest("'title' must be shorter than 101 characters."))
+                        .filter(discussion -> discussion.getDescription() != null, ignored -> badRequest("'description' must not be null."))
+                        .filter(discussion -> discussion.getDescription().length() > 10, ignored -> badRequest("'description' must be longer than 10 characters."))
+                        .filter(discussion -> discussion.getDescription().length() < 2001, ignored -> badRequest("'description' must be shorter than 2001 characters."))
+                        .flatMap(discussion -> {
+                            discussion.setAuthorId(session.getAccountId());
+                            return this.discussionService.createDiscussion(discussion);
+                        })
+                        .peek(discussion -> context.status(HttpStatus.CREATED).json(discussion))
+                        .onError(error -> context.status(error.code()).json(error)))
                 .onError(error -> context.status(error.code()).json(error));
     }
 

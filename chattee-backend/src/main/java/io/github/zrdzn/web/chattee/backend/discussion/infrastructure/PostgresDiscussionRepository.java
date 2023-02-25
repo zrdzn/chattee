@@ -37,9 +37,13 @@ public class PostgresDiscussionRepository implements DiscussionRepository {
             statement.setLong(3, discussion.getAuthorId());
             statement.executeUpdate();
 
-            long newId = statement.getGeneratedKeys().getLong("id");
+            long id = 0L;
+            ResultSet generatedKeys = statement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                id = generatedKeys.getLong(1);
+            }
 
-            return Result.ok(new Discussion(newId, discussion.getTitle(), discussion.getDescription(), discussion.getAuthorId()));
+            return Result.ok(new Discussion(id, discussion.getTitle(), discussion.getDescription(), discussion.getAuthorId()));
         } catch (SQLException exception) {
             String state = exception.getSQLState();
             if (state.equalsIgnoreCase(PSQLState.UNIQUE_VIOLATION.getState())) {

@@ -1,6 +1,8 @@
 package io.github.zrdzn.web.chattee.backend.web;
 
+import java.util.Optional;
 import io.javalin.http.Context;
+import io.javalin.http.Header;
 import panda.std.Result;
 
 public class ContextExtensions {
@@ -35,6 +37,14 @@ public class ContextExtensions {
 
     public static Result<String, HttpResponse> pathParamAsString(Context context, String id, String error) {
         return pathParamAsString(context, id).mapErr(ignored -> HttpResponse.badRequest(error));
+    }
+
+    public static Optional<String> extractTokenFromContext(Context context) {
+        String token = context.sessionAttribute("sessionid");
+        if (token == null) {
+            token = context.header(Header.AUTHORIZATION);
+        }
+        return Optional.ofNullable(token);
     }
 
 }
