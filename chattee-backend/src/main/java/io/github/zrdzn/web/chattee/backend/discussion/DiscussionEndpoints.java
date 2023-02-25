@@ -40,19 +40,19 @@ public class DiscussionEndpoints {
             headers = {
                     @OpenApiParam(
                             name = "Authorization",
-                            description = "Bearer authorization token",
+                            description = "Authorization token",
                             required = true,
-                            example = "Bearer <your-token>"
+                            example = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
                     )
             },
             requestBody = @OpenApiRequestBody(
-                    content = @OpenApiContent(from = Discussion.class)
+                    content = @OpenApiContent(from = DiscussionCreateDto.class)
             ),
             responses = {
                     @OpenApiResponse(
                             status = "201",
                             description = "Created discussion",
-                            content = { @OpenApiContent(from = HttpResponse.class) }
+                            content = { @OpenApiContent(from = Discussion.class) }
                     ),
                     @OpenApiResponse(
                             status = "400",
@@ -89,9 +89,9 @@ public class DiscussionEndpoints {
             headers = {
                     @OpenApiParam(
                             name = "Authorization",
-                            description = "Bearer authorization token",
+                            description = "Authorization token",
                             required = true,
-                            example = "Bearer <your-token>"
+                            example = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
                     )
             },
             responses = {
@@ -122,9 +122,9 @@ public class DiscussionEndpoints {
             headers = {
                     @OpenApiParam(
                             name = "Authorization",
-                            description = "Bearer authorization token",
+                            description = "Authorization token",
                             required = true,
-                            example = "Bearer <your-token>"
+                            example = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
                     )
             },
             pathParams = @OpenApiParam(

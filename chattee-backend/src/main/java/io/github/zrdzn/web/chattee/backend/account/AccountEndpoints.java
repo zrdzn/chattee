@@ -47,19 +47,19 @@ public class AccountEndpoints {
             headers = {
                     @OpenApiParam(
                             name = "Authorization",
-                            description = "Bearer authorization token",
+                            description = "Authorization token",
                             required = true,
-                            example = "Bearer <your-token>"
+                            example = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
                     )
             },
             requestBody = @OpenApiRequestBody(
-                    content = @OpenApiContent(from = Account.class)
+                    content = @OpenApiContent(from = AccountRegisterDto.class)
             ),
             responses = {
                     @OpenApiResponse(
                             status = "201",
                             description = "Registered account",
-                            content = { @OpenApiContent(from = HttpResponse.class) }
+                            content = { @OpenApiContent(from = Account.class) }
                     ),
                     @OpenApiResponse(
                             status = "400",
@@ -98,9 +98,9 @@ public class AccountEndpoints {
             headers = {
                     @OpenApiParam(
                             name = "Authorization",
-                            description = "Bearer authorization token",
+                            description = "Authorization token",
                             required = true,
-                            example = "Bearer <your-token>"
+                            example = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
                     )
             },
             responses = {
@@ -131,9 +131,9 @@ public class AccountEndpoints {
             headers = {
                     @OpenApiParam(
                             name = "Authorization",
-                            description = "Bearer authorization token",
+                            description = "Authorization token",
                             required = true,
-                            example = "Bearer <your-token>"
+                            example = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
                     )
             },
             pathParams = {
@@ -172,9 +172,9 @@ public class AccountEndpoints {
             headers = {
                     @OpenApiParam(
                             name = "Authorization",
-                            description = "Bearer authorization token",
+                            description = "Authorization token",
                             required = true,
-                            example = "Bearer <your-token>"
+                            example = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
                     )
             },
             pathParams = @OpenApiParam(
@@ -216,9 +216,9 @@ public class AccountEndpoints {
             headers = {
                     @OpenApiParam(
                             name = "Authorization",
-                            description = "Bearer authorization token",
+                            description = "Authorization token",
                             required = true,
-                            example = "Bearer <your-token>"
+                            example = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
                     )
             },
             pathParams = @OpenApiParam(
