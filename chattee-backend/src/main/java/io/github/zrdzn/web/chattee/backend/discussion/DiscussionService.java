@@ -19,8 +19,8 @@ public class DiscussionService {
         this.discussionRepository = discussionRepository;
     }
 
-    public Result<Discussion, HttpResponse> createDiscussion(Discussion discussion) {
-        return this.discussionRepository.saveDiscussion(discussion)
+    public Result<Discussion, HttpResponse> createDiscussion(DiscussionCreateDto discussionCreateDto, long authorId) {
+        return this.discussionRepository.saveDiscussion(new Discussion(discussionCreateDto, authorId))
                 .mapErr(error -> {
                     if (error == DomainError.DISCUSSION_ALREADY_EXISTS) {
                         return conflict("Discussion already exists.");

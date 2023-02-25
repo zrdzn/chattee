@@ -19,7 +19,6 @@ import io.javalin.openapi.OpenApiResponse;
 import static io.github.zrdzn.web.chattee.backend.web.ContextExtensions.bodyAsClass;
 import static io.github.zrdzn.web.chattee.backend.web.ContextExtensions.pathParamAsLong;
 import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.badRequest;
-import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.created;
 import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.ok;
 
 @Endpoints
@@ -72,17 +71,14 @@ public class DiscussionEndpoints {
     @Post(ENDPOINT)
     public void createDiscussion(Context context) {
         this.authService.authorizeFor(context, Privilege.DISCUSSION_OPEN)
-                .peek(session -> bodyAsClass(context, Discussion.class, "Discussion body is empty or invalid.")
+                .peek(session -> bodyAsClass(context, DiscussionCreateDto.class, "Discussion body is empty or invalid.")
                         .filter(discussion -> discussion.getTitle() != null, ignored -> badRequest("'title' must not be null."))
                         .filter(discussion -> discussion.getTitle().length() > 3, ignored -> badRequest("'title' must be longer than 3 characters."))
                         .filter(discussion -> discussion.getTitle().length() < 31, ignored -> badRequest("'title' must be shorter than 101 characters."))
                         .filter(discussion -> discussion.getDescription() != null, ignored -> badRequest("'description' must not be null."))
                         .filter(discussion -> discussion.getDescription().length() > 10, ignored -> badRequest("'description' must be longer than 10 characters."))
                         .filter(discussion -> discussion.getDescription().length() < 2001, ignored -> badRequest("'description' must be shorter than 2001 characters."))
-                        .flatMap(discussion -> {
-                            discussion.setAuthorId(session.getAccountId());
-                            return this.discussionService.createDiscussion(discussion);
-                        })
+                        .flatMap(discussion -> this.discussionService.createDiscussion(discussion, session.getAccountId()))
                         .peek(discussion -> context.status(HttpStatus.CREATED).json(discussion))
                         .onError(error -> context.status(error.code()).json(error)))
                 .onError(error -> context.status(error.code()).json(error));

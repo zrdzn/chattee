@@ -10,6 +10,10 @@ public class Discussion {
     public Discussion() {
     }
 
+    public Discussion(DiscussionCreateDto discussionCreateDto, long authorId) {
+        this(discussionCreateDto.getTitle(), discussionCreateDto.getDescription(), authorId);
+    }
+
     public Discussion(String title, String description, long authorId) {
         this(0L, title, description, authorId);
     }
