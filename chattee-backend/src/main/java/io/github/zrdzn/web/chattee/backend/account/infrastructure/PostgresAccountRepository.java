@@ -166,7 +166,7 @@ public class PostgresAccountRepository implements AccountRepository {
                 long recordId = result.getLong("id");
                 Privilege privilege = Privilege.valueOf(result.getString("privilege"));
 
-                privileges.add(new AccountPrivilege(recordId, id, privilege));
+                privileges.add(new AccountPrivilege(recordId, privilege));
             }
 
             return Result.ok(privileges);
