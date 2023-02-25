@@ -2,7 +2,6 @@ package io.github.zrdzn.web.chattee.backend.account;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import java.util.List;
-import java.util.stream.Collectors;
 import io.github.zrdzn.web.chattee.backend.shared.DomainError;
 import io.github.zrdzn.web.chattee.backend.web.HttpResponse;
 import panda.std.Blank;
@@ -21,12 +20,11 @@ public class AccountService {
         this.accountRepository = accountRepository;
     }
 
-    public Result<AccountDetailsDto, HttpResponse> registerAccount(AccountRegisterDto accountRegisterDto) {
+    public Result<Account, HttpResponse> registerAccount(AccountRegisterDto accountRegisterDto) {
         String password = BCrypt.withDefaults().hashToString(10, accountRegisterDto.getRawPassword().toCharArray());
         Account account = new Account(accountRegisterDto.getEmail(), password, accountRegisterDto.getUsername());
 
         return this.accountRepository.saveAccount(account)
-                .map(AccountDetailsDto::new)
                 .mapErr(error -> {
                     if (error == DomainError.ACCOUNT_ALREADY_EXISTS) {
                         return conflict("Account already exists.");
@@ -47,9 +45,8 @@ public class AccountService {
                 });
     }
 
-    public Result<List<AccountDetailsDto>, HttpResponse> getAllAccounts() {
+    public Result<List<Account>, HttpResponse> getAllAccounts() {
         return this.accountRepository.listAllAccounts()
-                .map(accounts -> accounts.stream().map(AccountDetailsDto::new).collect(Collectors.toList()))
                 .mapErr(error -> internalServerError("Could not retrieve all accounts."));
     }
 
@@ -58,9 +55,8 @@ public class AccountService {
                 .mapErr(error -> internalServerError("Could not retrieve privileges."));
     }
 
-    public Result<AccountDetailsDto, HttpResponse> getAccount(long id) {
+    public Result<Account, HttpResponse> getAccount(long id) {
         return this.accountRepository.findAccountById(id)
-                .map(AccountDetailsDto::new)
                 .mapErr(error -> {
                     if (error == DomainError.ACCOUNT_NOT_EXISTS) {
                         notFound("Account does not exist.");
@@ -70,9 +66,8 @@ public class AccountService {
                 });
     }
 
-    public Result<AccountDetailsDto, HttpResponse> getAccount(String email) {
+    public Result<Account, HttpResponse> getAccount(String email) {
         return this.accountRepository.findAccountByEmail(email)
-                .map(AccountDetailsDto::new)
                 .mapErr(error -> {
                     if (error == DomainError.ACCOUNT_NOT_EXISTS) {
                         notFound("Account does not exist.");

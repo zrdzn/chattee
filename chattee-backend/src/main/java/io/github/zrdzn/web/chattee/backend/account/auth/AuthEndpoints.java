@@ -3,7 +3,7 @@ package io.github.zrdzn.web.chattee.backend.account.auth;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import at.favre.lib.crypto.bcrypt.BCrypt;
-import io.github.zrdzn.web.chattee.backend.account.AccountDetailsDto;
+import io.github.zrdzn.web.chattee.backend.account.Account;
 import io.github.zrdzn.web.chattee.backend.account.AccountService;
 import io.github.zrdzn.web.chattee.backend.account.session.Session;
 import io.github.zrdzn.web.chattee.backend.account.session.SessionService;
@@ -69,12 +69,12 @@ public class AuthEndpoints {
                 .filter(credentials -> credentials.getEmail() != null, ignored -> badRequest("'email' must not be null."))
                 .filter(credentials -> credentials.getPassword() != null, ignored -> badRequest("'password' must not be null."))
                 .flatMap(credentials -> {
-                    Result<AccountDetailsDto, HttpResponse> accountMaybe = this.accountService.getAccount(credentials.getEmail());
+                    Result<Account, HttpResponse> accountMaybe = this.accountService.getAccount(credentials.getEmail());
                     if (accountMaybe.isErr()) {
                         return Result.error(accountMaybe.getError());
                     }
 
-                    AccountDetailsDto account = accountMaybe.get();
+                    Account account = accountMaybe.get();
 
                     if (!BCrypt.verifyer().verify(credentials.getPassword().toCharArray(), account.getPassword().toCharArray()).verified) {
                         return Result.error(unauthorized("Provided password is invalid."));
