@@ -46,7 +46,7 @@ public class AuthService {
 
             boolean hasAccess = false;
             for (RoutePrivilege routePrivilege : routePrivileges) {
-                if (privilegesResult.get().stream().anyMatch(p -> p.getPrivilege() == routePrivilege)) {
+                if (privilegesResult.get().stream().anyMatch(privilege -> privilege.getPrivilege() == routePrivilege)) {
                     hasAccess = true;
                     break;
                 }
