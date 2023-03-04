@@ -1,4 +1,4 @@
-package io.github.zrdzn.web.chattee.backend.discussion.infrastructure;
+package io.github.zrdzn.web.chattee.backend.discussion.repositories;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
