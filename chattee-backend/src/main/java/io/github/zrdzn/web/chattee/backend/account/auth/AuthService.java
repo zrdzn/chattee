@@ -27,17 +27,16 @@ public class AuthService {
 
     public Result<Session, HttpResponse> authorizeFor(Context context, RoutePrivilege... routePrivileges) {
         Optional<String> token = extractTokenFromContext(context);
-
         if (token.isEmpty()) {
             return Result.error(unauthorized("You must provide an access token."));
         }
 
-        Result<Session, HttpResponse> sessionMaybe = this.sessionService.getSession(token.get());
-        if (sessionMaybe.isErr()) {
-            return Result.error(unauthorized(sessionMaybe.getError().message()));
+        Result<Session, HttpResponse> sessionResult = this.sessionService.getSession(token.get());
+        if (sessionResult.isErr()) {
+            return Result.error(unauthorized(sessionResult.getError().message()));
         }
 
-        Session session = sessionMaybe.get();
+        Session session = sessionResult.get();
 
         if (routePrivileges.length > 0) {
             Result<List<Privilege>, HttpResponse> privilegesResult = this.privilegeService.getPrivilegesByAccountId(session.getAccountId());
@@ -46,12 +45,10 @@ public class AuthService {
             }
 
             boolean hasAccess = false;
-            for (Privilege privilege : privilegesResult.get()) {
-                for (RoutePrivilege routePrivilege : routePrivileges) {
-                    if (privilege.getPrivilege() == routePrivilege) {
-                        hasAccess = true;
-                        break;
-                    }
+            for (RoutePrivilege routePrivilege : routePrivileges) {
+                if (privilegesResult.get().stream().anyMatch(p -> p.getPrivilege() == routePrivilege)) {
+                    hasAccess = true;
+                    break;
                 }
             }
 
