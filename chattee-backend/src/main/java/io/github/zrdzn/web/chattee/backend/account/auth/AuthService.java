@@ -25,7 +25,7 @@ public class AuthService {
         this.privilegeService = privilegeService;
     }
 
-    public Result<Session, HttpResponse> authorizeFor(Context context, RoutePrivilege... routeRoutePrivileges) {
+    public Result<Session, HttpResponse> authorizeFor(Context context, RoutePrivilege... routePrivileges) {
         Optional<String> token = extractTokenFromContext(context);
 
         if (token.isEmpty()) {
@@ -39,7 +39,7 @@ public class AuthService {
 
         Session session = sessionMaybe.get();
 
-        if (routeRoutePrivileges.length > 0) {
+        if (routePrivileges.length > 0) {
             Result<List<Privilege>, HttpResponse> privilegesResult = this.privilegeService.getPrivilegesByAccountId(session.getAccountId());
             if (privilegesResult.isErr()) {
                 return Result.error(forbidden(privilegesResult.getError().message()));
@@ -47,7 +47,7 @@ public class AuthService {
 
             boolean hasAccess = false;
             for (Privilege privilege : privilegesResult.get()) {
-                for (RoutePrivilege routePrivilege : routeRoutePrivileges) {
+                for (RoutePrivilege routePrivilege : routePrivileges) {
                     if (privilege.getPrivilege() == routePrivilege) {
                         hasAccess = true;
                         break;
