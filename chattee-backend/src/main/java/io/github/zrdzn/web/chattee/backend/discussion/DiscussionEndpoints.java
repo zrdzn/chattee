@@ -2,7 +2,7 @@ package io.github.zrdzn.web.chattee.backend.discussion;
 
 import io.github.zrdzn.web.chattee.backend.account.auth.AuthService;
 import io.github.zrdzn.web.chattee.backend.web.HttpResponse;
-import io.github.zrdzn.web.chattee.backend.web.security.Privilege;
+import io.github.zrdzn.web.chattee.backend.web.security.RoutePrivilege;
 import io.javalin.community.routing.annotations.Delete;
 import io.javalin.community.routing.annotations.Endpoints;
 import io.javalin.community.routing.annotations.Get;
@@ -70,7 +70,7 @@ public class DiscussionEndpoints {
             })
     @Post(ENDPOINT)
     public void createDiscussion(Context context) {
-        this.authService.authorizeFor(context, Privilege.DISCUSSION_OPEN)
+        this.authService.authorizeFor(context, RoutePrivilege.DISCUSSION_OPEN)
                 .peek(session -> bodyAsClass(context, DiscussionCreateDto.class, "Discussion body is empty or invalid.")
                         .filter(discussion -> discussion.getTitle() != null, ignored -> badRequest("'title' must not be null."))
                         .filter(discussion -> discussion.getTitle().length() > 3, ignored -> badRequest("'title' must be longer than 3 characters."))
@@ -112,8 +112,10 @@ public class DiscussionEndpoints {
             })
     @Get(ENDPOINT)
     public void getAllDiscussions(Context context) {
-        this.discussionService.getAllDiscussions()
-                .peek(discussions -> context.status(HttpStatus.OK).json(discussions))
+        this.authService.authorizeFor(context, RoutePrivilege.DISCUSSION_VIEW_ALL)
+                .peek(session -> this.discussionService.getAllDiscussions()
+                        .peek(discussions -> context.status(HttpStatus.OK).json(discussions))
+                        .onError(error -> context.status(error.code()).json(error)))
                 .onError(error -> context.status(error.code()).json(error));
     }
 
@@ -155,9 +157,11 @@ public class DiscussionEndpoints {
             })
     @Get(ENDPOINT + "/{id}")
     public void getDiscussion(Context context) {
-        pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
-                .flatMap(this.discussionService::getDiscussion)
-                .peek(discussion -> context.status(HttpStatus.OK).json(discussion))
+        this.authService.authorizeFor(context, RoutePrivilege.DISCUSSION_VIEW)
+                .peek(session -> pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
+                        .flatMap(this.discussionService::getDiscussion)
+                        .peek(discussion -> context.status(HttpStatus.OK).json(discussion))
+                        .onError(error -> context.status(error.code()).json(error)))
                 .onError(error -> context.status(error.code()).json(error));
     }
 
@@ -194,9 +198,11 @@ public class DiscussionEndpoints {
             })
     @Delete(ENDPOINT + "/{id}")
     public void removeDiscussion(Context context) {
-        pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
-                .flatMap(this.discussionService::removeDiscussion)
-                .peek(ignored -> context.status(HttpStatus.OK).json(ok("Discussion has been removed.")))
+        this.authService.authorizeFor(context, RoutePrivilege.DISCUSSION_DELETE)
+                .peek(session -> pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
+                        .flatMap(this.discussionService::removeDiscussion)
+                        .peek(ignored -> context.status(HttpStatus.OK).json(ok("Discussion has been removed.")))
+                        .onError(error -> context.status(error.code()).json(error)))
                 .onError(error -> context.status(error.code()).json(error));
     }
 

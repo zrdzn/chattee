@@ -1,7 +1,9 @@
 package io.github.zrdzn.web.chattee.backend.account;
 
 import java.util.regex.Pattern;
+import io.github.zrdzn.web.chattee.backend.account.auth.AuthService;
 import io.github.zrdzn.web.chattee.backend.web.HttpResponse;
+import io.github.zrdzn.web.chattee.backend.web.security.RoutePrivilege;
 import io.javalin.community.routing.annotations.Delete;
 import io.javalin.community.routing.annotations.Endpoints;
 import io.javalin.community.routing.annotations.Get;
@@ -29,9 +31,11 @@ public class AccountEndpoints {
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Z\\d._%+-]+@[A-Z\\d.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
 
     private final AccountService accountService;
+    private final AuthService authService;
 
-    public AccountEndpoints(AccountService accountService) {
+    public AccountEndpoints(AccountService accountService, AuthService authService) {
         this.accountService = accountService;
+        this.authService = authService;
     }
 
     private static boolean validateEmail(String rawEmail) {
@@ -117,49 +121,10 @@ public class AccountEndpoints {
             })
     @Get(ACCOUNT_ENDPOINT)
     public void getAllAccounts(Context context) {
-        this.accountService.getAllAccounts()
-                .peek(accounts -> context.status(HttpStatus.OK).json(accounts))
-                .onError(error -> context.status(error.code()).json(error));
-    }
-
-    @OpenApi(
-            path = PRIVILEGE_ENDPOINT,
-            methods = { HttpMethod.GET },
-            summary = "Get privileges",
-            description = "Returns privileges",
-            tags = { "Account Privilege" },
-            headers = {
-                    @OpenApiParam(
-                            name = "Authorization",
-                            description = "Authorization token",
-                            required = true,
-                            example = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-                    )
-            },
-            pathParams = {
-                    @OpenApiParam(
-                            name = "accountId",
-                            description = "A numeric identifier associated with a record in the database",
-                            required = true
-                    )
-            },
-            responses = {
-                    @OpenApiResponse(
-                            status = "200",
-                            description = "Resulted accounts privileges",
-                            content = { @OpenApiContent(from = AccountPrivilege[].class) }
-                    ),
-                    @OpenApiResponse(
-                            status = "401",
-                            description = "Error message caused by unauthorized access",
-                            content = { @OpenApiContent(from = HttpResponse.class) }
-                    )
-            })
-    @Get(PRIVILEGE_ENDPOINT)
-    public void getAllPrivileges(Context context) {
-        pathParamAsLong(context, "accountId", "Specified identifier is not a valid long number.")
-                .flatMap(this.accountService::getPrivilegesByAccountId)
-                .peek(privileges -> context.status(HttpStatus.OK).json(privileges))
+        this.authService.authorizeFor(context, RoutePrivilege.ACCOUNT_VIEW_ALL)
+                .peek(session -> this.accountService.getAllAccounts()
+                        .peek(accounts -> context.status(HttpStatus.OK).json(accounts))
+                        .onError(error -> context.status(error.code()).json(error)))
                 .onError(error -> context.status(error.code()).json(error));
     }
 
@@ -201,9 +166,11 @@ public class AccountEndpoints {
             })
     @Get(ACCOUNT_ENDPOINT + "/{id}")
     public void getAccount(Context context) {
-        pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
-                .flatMap(this.accountService::getAccount)
-                .peek(accountDetails -> context.status(HttpStatus.OK).json(accountDetails))
+        this.authService.authorizeFor(context, RoutePrivilege.ACCOUNT_VIEW)
+                .peek(session -> pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
+                        .flatMap(this.accountService::getAccount)
+                        .peek(accountDetails -> context.status(HttpStatus.OK).json(accountDetails))
+                        .onError(error -> context.status(error.code()).json(error)))
                 .onError(error -> context.status(error.code()).json(error));
     }
 
@@ -240,9 +207,11 @@ public class AccountEndpoints {
             })
     @Delete(ACCOUNT_ENDPOINT + "/{id}")
     public void removeAccount(Context context) {
-        pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
-                .flatMap(this.accountService::removeAccount)
-                .peek(ignored -> context.status(HttpStatus.OK).json(ok("Account has been removed.")))
+        this.authService.authorizeFor(context, RoutePrivilege.ACCOUNT_DELETE)
+                .peek(session -> pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
+                        .flatMap(this.accountService::removeAccount)
+                        .peek(ignored -> context.status(HttpStatus.OK).json(ok("Account has been removed.")))
+                        .onError(error -> context.status(error.code()).json(error)))
                 .onError(error -> context.status(error.code()).json(error));
     }
 

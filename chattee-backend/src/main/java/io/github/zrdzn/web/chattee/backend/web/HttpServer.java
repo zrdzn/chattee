@@ -10,6 +10,10 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.github.zrdzn.web.chattee.backend.ChatteeConfig;
 import io.github.zrdzn.web.chattee.backend.account.AccountService;
 import io.github.zrdzn.web.chattee.backend.account.auth.AuthService;
+import io.github.zrdzn.web.chattee.backend.account.privilege.PrivilegeRepository;
+import io.github.zrdzn.web.chattee.backend.account.privilege.PrivilegeService;
+import io.github.zrdzn.web.chattee.backend.account.privilege.PrivilegeWebConfig;
+import io.github.zrdzn.web.chattee.backend.account.privilege.infrastructure.PostgresPrivilegeRepository;
 import io.github.zrdzn.web.chattee.backend.discussion.DiscussionWebConfig;
 import io.github.zrdzn.web.chattee.backend.storage.postgres.PostgresStorage;
 import io.github.zrdzn.web.chattee.backend.account.AccountWebConfig;
@@ -68,18 +72,23 @@ public class HttpServer {
     private void configureRoutes(JavalinConfig config, PostgresStorage postgresStorage) {
         AnnotationsRoutingPlugin plugin = new AnnotationsRoutingPlugin();
 
-        AccountWebConfig accountWebConfig = new AccountWebConfig(postgresStorage);
-        accountWebConfig.initialize(plugin);
-        AccountService accountService = accountWebConfig.getAccountService();
-
         SessionRepository sessionRepository = new PostgresSessionRepository(postgresStorage);
         SessionService sessionService = new SessionService(sessionRepository, new AccessTokenService());
 
-        AuthService authService = new AuthService(sessionService, accountService);
+        PrivilegeRepository privilegeRepository = new PostgresPrivilegeRepository(postgresStorage);
+        PrivilegeService privilegeService = new PrivilegeService(privilegeRepository);
+
+        AuthService authService = new AuthService(sessionService, privilegeService);
+
+        AccountWebConfig accountWebConfig = new AccountWebConfig(postgresStorage, authService);
+        accountWebConfig.initialize(plugin);
+        AccountService accountService = accountWebConfig.getAccountService();
+
+        new PrivilegeWebConfig(privilegeService, accountService, authService).initialize(plugin);
 
         new DiscussionWebConfig(postgresStorage, authService).initialize(plugin);
 
-        new AuthWebConfig(accountWebConfig.getAccountService(), sessionService).initialize(plugin);
+        new AuthWebConfig(accountService, sessionService).initialize(plugin);
 
         config.plugins.register(plugin);
     }

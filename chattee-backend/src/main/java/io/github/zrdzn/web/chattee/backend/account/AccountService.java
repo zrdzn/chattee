@@ -2,6 +2,7 @@ package io.github.zrdzn.web.chattee.backend.account;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import java.util.List;
+import io.github.zrdzn.web.chattee.backend.account.privilege.Privilege;
 import io.github.zrdzn.web.chattee.backend.shared.DomainError;
 import io.github.zrdzn.web.chattee.backend.web.HttpResponse;
 import panda.std.Blank;
@@ -34,7 +35,7 @@ public class AccountService {
                 });
     }
 
-    public Result<AccountPrivilege, HttpResponse> createPrivilege(AccountPrivilege privilege) {
+    public Result<Privilege, HttpResponse> createPrivilege(Privilege privilege) {
         return this.accountRepository.savePrivilege(privilege)
                 .mapErr(error -> {
                     if (error == DomainError.ACCOUNT_INVALID_ID) {
@@ -48,11 +49,6 @@ public class AccountService {
     public Result<List<Account>, HttpResponse> getAllAccounts() {
         return this.accountRepository.listAllAccounts()
                 .mapErr(error -> internalServerError("Could not retrieve all accounts."));
-    }
-
-    public Result<List<AccountPrivilege>, HttpResponse> getPrivilegesByAccountId(long id) {
-        return this.accountRepository.findPrivilegesByAccountId(id)
-                .mapErr(error -> internalServerError("Could not retrieve privileges."));
     }
 
     public Result<Account, HttpResponse> getAccount(long id) {

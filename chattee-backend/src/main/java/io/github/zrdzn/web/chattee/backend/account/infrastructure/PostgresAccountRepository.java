@@ -11,8 +11,7 @@ import io.github.zrdzn.web.chattee.backend.account.Account;
 import io.github.zrdzn.web.chattee.backend.shared.DomainError;
 import io.github.zrdzn.web.chattee.backend.storage.postgres.PostgresStorage;
 import io.github.zrdzn.web.chattee.backend.account.AccountRepository;
-import io.github.zrdzn.web.chattee.backend.account.AccountPrivilege;
-import io.github.zrdzn.web.chattee.backend.web.security.Privilege;
+import io.github.zrdzn.web.chattee.backend.account.privilege.Privilege;
 import org.postgresql.util.PSQLState;
 import org.tinylog.Logger;
 import panda.std.Blank;
@@ -27,7 +26,6 @@ public class PostgresAccountRepository implements AccountRepository {
 
     private static final String SELECT_ACCOUNT_BY_ID = "select email, password, username, created_at, updated_at from accounts where id = ?;";
     private static final String SELECT_ACCOUNT_BY_EMAIL = "select id, password, username, created_at, updated_at from accounts where email = ?;";
-    private static final String SELECT_PRIVILEGES_BY_ACCOUNT_ID = "select privilege from accounts_privileges where account_id = ?;";
 
     private static final String DELETE_ACCOUNT_BY_ID = "delete from accounts where id = ?;";
     private static final String DELETE_PRIVILEGE_BY_ID = "delete from accounts_privileges where id = ?;";
@@ -63,7 +61,7 @@ public class PostgresAccountRepository implements AccountRepository {
     }
 
     @Override
-    public Result<AccountPrivilege, DomainError> savePrivilege(AccountPrivilege privilege) {
+    public Result<Privilege, DomainError> savePrivilege(Privilege privilege) {
         try (Connection connection = this.postgresStorage.getHikariDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(INSERT_PRIVILEGE)) {
             statement.setLong(1, privilege.getAccountId());
@@ -149,28 +147,6 @@ public class PostgresAccountRepository implements AccountRepository {
             return Result.ok(new Account(id, email, password, username, createdAt, updatedAt));
         } catch (SQLException exception) {
             Logger.error(exception, "Could not find account.");
-            return Result.error(DomainError.SQL_EXCEPTION);
-        }
-    }
-
-    @Override
-    public Result<List<AccountPrivilege>, DomainError> findPrivilegesByAccountId(long id) {
-        try (Connection connection = this.postgresStorage.getHikariDataSource().getConnection();
-             PreparedStatement statement = connection.prepareStatement(SELECT_PRIVILEGES_BY_ACCOUNT_ID)) {
-            statement.setLong(1, id);
-
-            List<AccountPrivilege> privileges = new ArrayList<>();
-
-            ResultSet result = statement.executeQuery();
-            while (result.next()) {
-                Privilege privilege = Privilege.valueOf(result.getString("privilege"));
-
-                privileges.add(new AccountPrivilege(id, privilege));
-            }
-
-            return Result.ok(privileges);
-        } catch (SQLException exception) {
-            Logger.error(exception, "Could not find privileges.");
             return Result.error(DomainError.SQL_EXCEPTION);
         }
     }

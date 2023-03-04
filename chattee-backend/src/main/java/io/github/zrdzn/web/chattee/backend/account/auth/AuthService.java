@@ -2,12 +2,12 @@ package io.github.zrdzn.web.chattee.backend.account.auth;
 
 import java.util.List;
 import java.util.Optional;
-import io.github.zrdzn.web.chattee.backend.account.AccountPrivilege;
-import io.github.zrdzn.web.chattee.backend.account.AccountService;
+import io.github.zrdzn.web.chattee.backend.account.privilege.Privilege;
+import io.github.zrdzn.web.chattee.backend.account.privilege.PrivilegeService;
 import io.github.zrdzn.web.chattee.backend.account.session.Session;
 import io.github.zrdzn.web.chattee.backend.account.session.SessionService;
 import io.github.zrdzn.web.chattee.backend.web.HttpResponse;
-import io.github.zrdzn.web.chattee.backend.web.security.Privilege;
+import io.github.zrdzn.web.chattee.backend.web.security.RoutePrivilege;
 import io.javalin.http.Context;
 import panda.std.Result;
 
@@ -18,14 +18,14 @@ import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.unauthorized;
 public class AuthService {
 
     private final SessionService sessionService;
-    private final AccountService accountService;
+    private final PrivilegeService privilegeService;
 
-    public AuthService(SessionService sessionService, AccountService accountService) {
+    public AuthService(SessionService sessionService, PrivilegeService privilegeService) {
         this.sessionService = sessionService;
-        this.accountService = accountService;
+        this.privilegeService = privilegeService;
     }
 
-    public Result<Session, HttpResponse> authorizeFor(Context context, Privilege... routePrivileges) {
+    public Result<Session, HttpResponse> authorizeFor(Context context, RoutePrivilege... routeRoutePrivileges) {
         Optional<String> token = extractTokenFromContext(context);
 
         if (token.isEmpty()) {
@@ -39,16 +39,16 @@ public class AuthService {
 
         Session session = sessionMaybe.get();
 
-        if (routePrivileges.length > 0) {
-            Result<List<AccountPrivilege>, HttpResponse> privilegesResult = this.accountService.getPrivilegesByAccountId(session.getAccountId());
+        if (routeRoutePrivileges.length > 0) {
+            Result<List<Privilege>, HttpResponse> privilegesResult = this.privilegeService.getPrivilegesByAccountId(session.getAccountId());
             if (privilegesResult.isErr()) {
                 return Result.error(forbidden(privilegesResult.getError().message()));
             }
 
             boolean hasAccess = false;
-            for (AccountPrivilege accountPrivilege : privilegesResult.get()) {
-                for (Privilege privilege : routePrivileges) {
-                    if (accountPrivilege.getPrivilege() == privilege) {
+            for (Privilege privilege : privilegesResult.get()) {
+                for (RoutePrivilege routePrivilege : routeRoutePrivileges) {
+                    if (privilege.getPrivilege() == routePrivilege) {
                         hasAccess = true;
                         break;
                     }
