@@ -32,14 +32,13 @@ public class PostgresStorage implements Storage, Poolable {
                 cdn.render(storage, resource);
             }
 
-            HikariConfig hikariConfig = new HikariConfig();
-
             if (storage.getSsl().equals("false")) {
                 Logger.warn("Storage connection is configured without SSL enabled.");
             }
 
             this.jdbc = String.format("jdbc:postgresql://%s:%s/%s?ssl=%s", storage.getHost(), storage.getPort(), storage.getDb(), storage.getSsl());
 
+            HikariConfig hikariConfig = new HikariConfig();
             hikariConfig.setJdbcUrl(this.jdbc);
             hikariConfig.setUsername(storage.getUser());
             hikariConfig.setPassword(storage.getPass());
