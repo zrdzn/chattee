@@ -84,7 +84,7 @@ public class PrivilegeEndpoints {
     }
 
     @OpenApi(
-            path = PRIVILEGE_ENDPOINT,
+            path = PRIVILEGE_ENDPOINT + "/{accountId}",
             methods = { HttpMethod.GET },
             summary = "Get privileges",
             description = "Returns privileges",
@@ -116,7 +116,7 @@ public class PrivilegeEndpoints {
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     )
             })
-    @Get(PRIVILEGE_ENDPOINT)
+    @Get(PRIVILEGE_ENDPOINT + "/{accountId}")
     public void getAllPrivilegesByAccountId(Context context) {
         this.authService.authorizeFor(context, RoutePrivilege.ACCOUNT_PRIVILEGE_VIEW_ALL)
                 .peek(session -> pathParamAsLong(context, "accountId", "Specified identifier is not a valid long number.")
