@@ -54,8 +54,6 @@ public class HttpServer {
                     this.configureOpenApi(config);
                     this.configureSwagger(config);
                 }).events(event -> event.serverStopping(postgresStorage::stop))
-                .error(HttpStatus.NOT_FOUND.getCode(), context -> context.status(HttpStatus.NOT_FOUND).json(HttpResponse.notFound("Page not found.")))
-                .error(HttpStatus.INTERNAL_SERVER_ERROR.getCode(), context -> context.status(HttpStatus.INTERNAL_SERVER_ERROR).json(HttpResponse.internalServerError("Something went wrong.")))
                 .exception(JsonParseException.class, (exception, context) ->
                         context.status(HttpStatus.BAD_REQUEST).json(HttpResponse.badRequest("You have provided invalid details.")))
                 .start(chatteeConfig.getPort());
