@@ -16,6 +16,7 @@ import io.javalin.openapi.OpenApiContent;
 import io.javalin.openapi.OpenApiParam;
 import io.javalin.openapi.OpenApiRequestBody;
 import io.javalin.openapi.OpenApiResponse;
+import panda.utilities.StringUtils;
 
 import static io.github.zrdzn.web.chattee.backend.web.ContextExtensions.bodyAsClass;
 import static io.github.zrdzn.web.chattee.backend.web.ContextExtensions.pathParamAsLong;
@@ -26,7 +27,6 @@ import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.ok;
 public class AccountEndpoints {
 
     public static final String ACCOUNT_ENDPOINT = "/api/v1/accounts";
-    public static final String PRIVILEGE_ENDPOINT = "/api/v1/accounts/{accountId}/privileges";
 
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Z\\d._%+-]+@[A-Z\\d.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
 
@@ -82,10 +82,10 @@ public class AccountEndpoints {
                 .filter(account -> account.getEmail() != null, ignored -> badRequest("'email' must not be null."))
                 .filter(account -> validateEmail(account.getEmail()), ignored -> badRequest("'email' is not a valid email."))
                 .filter(account -> account.getEmail().length() < 65, ignored -> badRequest("'email' must be shorter than 65 characters."))
-                .filter(account -> account.getRawPassword() != null, ignored -> badRequest("'rawPassword' must not be null."))
+                .filterNot(account -> StringUtils.isEmpty(account.getRawPassword()), ignored -> badRequest("'rawPassword' must not be empty."))
                 .filter(account -> account.getRawPassword().length() > 6, ignored -> badRequest("'rawPassword' must be longer than 6 characters."))
                 .filter(account -> account.getRawPassword().length() < 81, ignored -> badRequest("'rawPassword' must be shorter than 81 characters."))
-                .filter(account -> account.getUsername() != null, ignored -> badRequest("'username' must not be null."))
+                .filterNot(account -> StringUtils.isEmpty(account.getUsername()), ignored -> badRequest("'username' must not be null."))
                 .filter(account -> account.getUsername().length() > 3, ignored -> badRequest("'username' must be longer than 3 characters."))
                 .filter(account -> account.getUsername().length() < 33, ignored -> badRequest("'username' must be shorter than 33 characters."))
                 .flatMap(this.accountService::registerAccount)

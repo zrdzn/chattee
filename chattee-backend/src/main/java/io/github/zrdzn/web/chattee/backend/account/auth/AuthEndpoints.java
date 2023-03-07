@@ -18,6 +18,7 @@ import io.javalin.openapi.OpenApiContent;
 import io.javalin.openapi.OpenApiRequestBody;
 import io.javalin.openapi.OpenApiResponse;
 import panda.std.Result;
+import panda.utilities.StringUtils;
 
 import static io.github.zrdzn.web.chattee.backend.web.ContextExtensions.bodyAsClass;
 import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.accepted;
@@ -66,8 +67,8 @@ public class AuthEndpoints {
     @Post(ENDPOINT)
     public void authenticate(Context context) {
         bodyAsClass(context, AuthCredentials.class, "Authentication body is empty or invalid.")
-                .filter(credentials -> credentials.getEmail() != null, ignored -> badRequest("'email' must not be null."))
-                .filter(credentials -> credentials.getPassword() != null, ignored -> badRequest("'password' must not be null."))
+                .filterNot(credentials -> StringUtils.isEmpty(credentials.getEmail()), ignored -> badRequest("'email' must not be empty."))
+                .filterNot(credentials -> StringUtils.isEmpty(credentials.getPassword()), ignored -> badRequest("'password' must not be empty."))
                 .flatMap(credentials -> {
                     Result<Account, HttpResponse> accountMaybe = this.accountService.getAccount(credentials.getEmail());
                     if (accountMaybe.isErr()) {

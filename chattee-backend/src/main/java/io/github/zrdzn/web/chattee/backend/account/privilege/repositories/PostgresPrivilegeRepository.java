@@ -1,4 +1,4 @@
-package io.github.zrdzn.web.chattee.backend.account.privilege.infrastructure;
+package io.github.zrdzn.web.chattee.backend.account.privilege.repositories;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;

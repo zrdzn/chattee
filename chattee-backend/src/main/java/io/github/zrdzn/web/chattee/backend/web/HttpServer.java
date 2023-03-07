@@ -13,7 +13,7 @@ import io.github.zrdzn.web.chattee.backend.account.auth.AuthService;
 import io.github.zrdzn.web.chattee.backend.account.privilege.PrivilegeRepository;
 import io.github.zrdzn.web.chattee.backend.account.privilege.PrivilegeService;
 import io.github.zrdzn.web.chattee.backend.account.privilege.PrivilegeWebConfig;
-import io.github.zrdzn.web.chattee.backend.account.privilege.infrastructure.PostgresPrivilegeRepository;
+import io.github.zrdzn.web.chattee.backend.account.privilege.repositories.PostgresPrivilegeRepository;
 import io.github.zrdzn.web.chattee.backend.discussion.DiscussionWebConfig;
 import io.github.zrdzn.web.chattee.backend.storage.postgres.PostgresStorage;
 import io.github.zrdzn.web.chattee.backend.account.AccountWebConfig;

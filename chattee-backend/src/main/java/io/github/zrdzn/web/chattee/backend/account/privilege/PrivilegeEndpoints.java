@@ -77,7 +77,7 @@ public class PrivilegeEndpoints {
         context.async(() ->
                 bodyAsClass(context, Privilege.class, "Privilege body is empty or invalid.")
                         .filter(privilege -> privilege.getAccountId() > 0L, ignored -> badRequest("'accountId' must be higher than 0."))
-                        .filter(privilege -> privilege.getPrivilege() != null, ignored -> badRequest("'privilege' must not be null."))
+                        .filterNot(privilege -> privilege.getPrivilege() == null, ignored -> badRequest("'privilege' must not be null."))
                         .flatMap(this.accountService::createPrivilege)
                         .peek(ignored -> context.status(HttpStatus.CREATED).json(created("Privilege has been created.")))
                         .onError(error -> context.status(error.code()).json(error)));

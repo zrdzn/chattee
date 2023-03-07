@@ -15,6 +15,7 @@ import io.javalin.openapi.OpenApiContent;
 import io.javalin.openapi.OpenApiParam;
 import io.javalin.openapi.OpenApiRequestBody;
 import io.javalin.openapi.OpenApiResponse;
+import panda.utilities.StringUtils;
 
 import static io.github.zrdzn.web.chattee.backend.web.ContextExtensions.bodyAsClass;
 import static io.github.zrdzn.web.chattee.backend.web.ContextExtensions.pathParamAsLong;
@@ -72,10 +73,10 @@ public class DiscussionEndpoints {
     public void createDiscussion(Context context) {
         this.authService.authorizeFor(context, RoutePrivilege.DISCUSSION_OPEN)
                 .peek(session -> bodyAsClass(context, DiscussionCreateDto.class, "Discussion body is empty or invalid.")
-                        .filter(discussion -> discussion.getTitle() != null, ignored -> badRequest("'title' must not be null."))
+                        .filterNot(discussion -> StringUtils.isEmpty(discussion.getTitle()), ignored -> badRequest("'title' must not be null."))
                         .filter(discussion -> discussion.getTitle().length() > 3, ignored -> badRequest("'title' must be longer than 3 characters."))
                         .filter(discussion -> discussion.getTitle().length() < 31, ignored -> badRequest("'title' must be shorter than 101 characters."))
-                        .filter(discussion -> discussion.getDescription() != null, ignored -> badRequest("'description' must not be null."))
+                        .filterNot(discussion -> StringUtils.isEmpty(discussion.getDescription()), ignored -> badRequest("'description' must not be null."))
                         .filter(discussion -> discussion.getDescription().length() > 10, ignored -> badRequest("'description' must be longer than 10 characters."))
                         .filter(discussion -> discussion.getDescription().length() < 2001, ignored -> badRequest("'description' must be shorter than 2001 characters."))
                         .flatMap(discussion -> this.discussionService.createDiscussion(discussion, session.getAccountId()))
