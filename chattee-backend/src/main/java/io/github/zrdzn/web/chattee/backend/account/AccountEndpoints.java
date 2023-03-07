@@ -48,14 +48,6 @@ public class AccountEndpoints {
             summary = "Registers an account",
             description = "Registers an account and returns it",
             tags = { "Account" },
-            headers = {
-                    @OpenApiParam(
-                            name = "Authorization",
-                            description = "Authorization token",
-                            required = true,
-                            example = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
-                    )
-            },
             requestBody = @OpenApiRequestBody(
                     content = @OpenApiContent(from = AccountRegisterDto.class)
             ),
@@ -68,11 +60,6 @@ public class AccountEndpoints {
                     @OpenApiResponse(
                             status = "400",
                             description = "Error message when fields were considered incorrect during validation process",
-                            content = { @OpenApiContent(from = HttpResponse.class) }
-                    ),
-                    @OpenApiResponse(
-                            status = "401",
-                            description = "Error message caused by unauthorized access",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     )
             })
