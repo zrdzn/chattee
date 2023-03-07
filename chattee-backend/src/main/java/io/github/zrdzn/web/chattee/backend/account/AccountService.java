@@ -55,7 +55,7 @@ public class AccountService {
         return this.accountRepository.findAccountById(id)
                 .mapErr(error -> {
                     if (error == DomainError.ACCOUNT_NOT_EXISTS) {
-                        notFound("Account does not exist.");
+                        return notFound("Account does not exist.");
                     }
 
                     return internalServerError("Could not retrieve account.");
@@ -66,7 +66,7 @@ public class AccountService {
         return this.accountRepository.findAccountByEmail(email)
                 .mapErr(error -> {
                     if (error == DomainError.ACCOUNT_NOT_EXISTS) {
-                        notFound("Account does not exist.");
+                        return notFound("Account does not exist.");
                     }
 
                     return internalServerError("Could not retrieve account.");
