@@ -90,7 +90,7 @@ public class AuthEndpoints {
                     return createSessionResult;
                 }).peek(session -> context.status(HttpStatus.ACCEPTED)
                         .json(accepted(session.getToken()))
-                        .sessionAttribute("sessionid", session.getToken()))
+                        .sessionAttribute("tokenid", session.getToken()))
                 .onError(error -> context.status(error.code()).json(error));
     }
 

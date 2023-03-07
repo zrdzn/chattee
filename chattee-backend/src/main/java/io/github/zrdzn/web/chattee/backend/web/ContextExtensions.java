@@ -40,7 +40,7 @@ public class ContextExtensions {
     }
 
     public static Optional<String> extractTokenFromContext(Context context) {
-        String token = context.sessionAttribute("sessionid");
+        String token = context.sessionAttribute("tokenid");
         if (token == null) {
             token = context.header(Header.AUTHORIZATION);
         }
