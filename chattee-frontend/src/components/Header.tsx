@@ -23,6 +23,6 @@ export const Header = ({ title, keywords, description, faviconUrl }: HeaderPrope
 Header.defaultProps = {
     title: 'Chattee',
     keywords: 'chattee, forum, engine',
-    description: 'Simple Open Source forum engine made in Spring Boot and Next.js + Tailwind.',
+    description: 'Simple Open Source forum engine made in Javalin and Next.js + Tailwindcss.',
     faviconUrl: './favicon.ico'
 }
