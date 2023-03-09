@@ -1,7 +1,6 @@
 import {DiscussionItem} from "./DiscussionItem";
 import axios from "axios";
 import {useEffect, useState} from "react";
-import {cookies} from "next/headers";
 
 export const DiscussionList = () => {
     const [discussions, setDiscussions] = useState([]);
