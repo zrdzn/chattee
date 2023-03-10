@@ -86,7 +86,7 @@ public class HttpServer {
 
         new DiscussionWebConfig(postgresStorage, authService).initialize(plugin);
 
-        new AuthWebConfig(accountService, sessionService).initialize(plugin);
+        new AuthWebConfig(accountService, sessionService, authService).initialize(plugin);
 
         config.plugins.register(plugin);
     }

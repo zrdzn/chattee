@@ -8,13 +8,16 @@ import io.github.zrdzn.web.chattee.backend.account.AccountService;
 import io.github.zrdzn.web.chattee.backend.account.session.Session;
 import io.github.zrdzn.web.chattee.backend.account.session.SessionService;
 import io.github.zrdzn.web.chattee.backend.web.HttpResponse;
+import io.github.zrdzn.web.chattee.backend.web.security.RoutePrivilege;
 import io.javalin.community.routing.annotations.Endpoints;
+import io.javalin.community.routing.annotations.Get;
 import io.javalin.community.routing.annotations.Post;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
 import io.javalin.openapi.HttpMethod;
 import io.javalin.openapi.OpenApi;
 import io.javalin.openapi.OpenApiContent;
+import io.javalin.openapi.OpenApiParam;
 import io.javalin.openapi.OpenApiRequestBody;
 import io.javalin.openapi.OpenApiResponse;
 import panda.std.Result;
@@ -32,10 +35,12 @@ public class AuthEndpoints {
 
     private final AccountService accountService;
     private final SessionService sessionService;
+    private final AuthService authService;
 
-    public AuthEndpoints(AccountService accountService, SessionService sessionService) {
+    public AuthEndpoints(AccountService accountService, SessionService sessionService, AuthService authService) {
         this.accountService = accountService;
         this.sessionService = sessionService;
+        this.authService = authService;
     }
 
     @OpenApi(
@@ -92,6 +97,39 @@ public class AuthEndpoints {
                 }).peek(session -> context.status(HttpStatus.ACCEPTED)
                         .json(accepted(session.getToken()))
                         .sessionAttribute("tokenid", session.getToken()))
+                .onError(error -> context.status(error.code()).json(error));
+    }
+
+    @OpenApi(
+            path = ENDPOINT + "/me",
+            methods = { HttpMethod.GET },
+            summary = "Get session details",
+            description = "Returns all session details",
+            tags = { "Auth" },
+            headers = {
+                    @OpenApiParam(
+                            name = "Authorization",
+                            description = "Authorization token",
+                            required = true,
+                            example = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+                    )
+            },
+            responses = {
+                    @OpenApiResponse(
+                            status = "200",
+                            description = "Resulted session details",
+                            content = { @OpenApiContent(from = Session.class) }
+                    ),
+                    @OpenApiResponse(
+                            status = "401",
+                            description = "Error message caused by unauthorized access",
+                            content = { @OpenApiContent(from = HttpResponse.class) }
+                    )
+            })
+    @Get(ENDPOINT + "/me")
+    public void getSessionDetails(Context context) {
+        this.authService.authorizeFor(context, RoutePrivilege.SESSION_DETAILS_VIEW)
+                .peek(session -> context.status(HttpStatus.OK).json(session))
                 .onError(error -> context.status(error.code()).json(error));
     }
 

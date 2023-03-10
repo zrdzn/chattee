@@ -9,6 +9,8 @@ public enum RoutePrivilege implements RouteRole {
     DISCUSSION_VIEW,
     DISCUSSION_DELETE,
 
+    SESSION_DETAILS_VIEW,
+
     ACCOUNT_VIEW_ALL,
     ACCOUNT_VIEW,
     ACCOUNT_DELETE,
