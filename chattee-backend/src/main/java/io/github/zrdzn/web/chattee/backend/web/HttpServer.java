@@ -14,6 +14,7 @@ import io.github.zrdzn.web.chattee.backend.account.privilege.PrivilegeRepository
 import io.github.zrdzn.web.chattee.backend.account.privilege.PrivilegeService;
 import io.github.zrdzn.web.chattee.backend.account.privilege.PrivilegeWebConfig;
 import io.github.zrdzn.web.chattee.backend.account.privilege.repositories.PostgresPrivilegeRepository;
+import io.github.zrdzn.web.chattee.backend.account.session.SessionHandler;
 import io.github.zrdzn.web.chattee.backend.discussion.DiscussionWebConfig;
 import io.github.zrdzn.web.chattee.backend.storage.postgres.PostgresStorage;
 import io.github.zrdzn.web.chattee.backend.account.AccountWebConfig;
@@ -32,7 +33,6 @@ import io.javalin.openapi.plugin.OpenApiPlugin;
 import io.javalin.openapi.plugin.OpenApiPluginConfiguration;
 import io.javalin.openapi.plugin.swagger.SwaggerConfiguration;
 import io.javalin.openapi.plugin.swagger.SwaggerPlugin;
-import io.javalin.plugin.bundled.CorsPluginConfig;
 
 public class HttpServer {
 
@@ -43,7 +43,10 @@ public class HttpServer {
                 .create(config -> {
                     config.http.defaultContentType = ContentType.JSON;
 
-                    config.plugins.enableCors(cors -> cors.add(CorsPluginConfig::anyHost));
+                    config.plugins.enableCors(cors -> cors.add(corsConfig -> {
+                        corsConfig.allowHost("http://localhost:3000");
+                        corsConfig.allowCredentials = true;
+                    }));
 
                     config.routing.ignoreTrailingSlashes = true;
 
@@ -53,6 +56,8 @@ public class HttpServer {
                     this.configureJsonMapper(config);
                     this.configureOpenApi(config);
                     this.configureSwagger(config);
+
+                    config.jetty.sessionHandler(() -> new SessionHandler().createPostgresSessionHandler(postgresStorage));
                 }).events(event -> event.serverStopping(postgresStorage::stop))
                 .exception(JsonParseException.class, (exception, context) ->
                         context.status(HttpStatus.BAD_REQUEST).json(HttpResponse.badRequest("You have provided invalid details.")))
