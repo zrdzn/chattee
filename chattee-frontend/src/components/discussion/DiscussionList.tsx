@@ -4,22 +4,22 @@ import {useEffect, useState} from "react";
 
 export const DiscussionList = () => {
     const [discussions, setDiscussions] = useState([]);
-    const [error, setError] = useState("An error occurred while loading discussions.")
-
+    const [error, setError] = useState("")
 
     useEffect(() => {
-        axios.get('http://localhost:7070/api/v1/discussions')
+        axios.get('http://localhost:7070/api/v1/discussions', { withCredentials: true })
             .then((response) => {
                 setDiscussions(response.data);
             })
             .catch((error) => {
-                if (error.response.status === 401) {
-                    setError("You do not have access to view discussions.")
-                    return;
-                }
+                console.error(error)
                 setError(error)
             });
     }, []);
+
+    if (discussions.length === 0) {
+        return <h1>Nie ma żadnych dyskusji.</h1>
+    }
 
     if (error) {
         return <h1>{error}</h1>

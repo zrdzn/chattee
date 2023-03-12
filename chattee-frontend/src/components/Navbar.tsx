@@ -1,8 +1,22 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import Link from "next/link";
+import {Dropdown} from "./Dropdown";
+import axios from "axios";
 
 export const Navbar = () => {
     const [navbar, setNavbar] = useState(false);
+    const [username, setUsername] = useState("");
+
+    useEffect(() => {
+        axios.get('http://localhost:7070/api/v1/auth/me', { withCredentials: true })
+            .then((session) => {
+                axios.get(`http://localhost:7070/api/v1/accounts/${session.data.accountId}`, { withCredentials: true })
+                    .then(account => setUsername(account.data.username))
+                    .catch((error) => console.error(error))
+            })
+            .catch((error) => console.error(error));
+    }, []);
+
     return (
         <div>
             <nav className="w-full bg-gray-800 shadow">
@@ -46,12 +60,20 @@ export const Navbar = () => {
                                 <li className="text-white">
                                     <Link href="../discussions">Discussions</Link>
                                 </li>
-                                <li className="text-white">
-                                    <Link href="../account/register">Sign up</Link>
-                                </li>
-                                <li className="text-white">
-                                    <Link href="../account/login">Sign in</Link>
-                                </li>
+                                {username ?
+                                    <li className="text-white">
+                                        <Dropdown username={username} />
+                                    </li>
+                                    :
+                                    <>
+                                        <li className="text-white">
+                                            <Link href="../account/register">Sign up</Link>
+                                        </li>
+                                        <li className="text-white">
+                                            <Link href="../account/login">Sign in</Link>
+                                        </li>
+                                    </>
+                                }
                             </ul>
                         </div>
                     </div>

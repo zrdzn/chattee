@@ -12,7 +12,7 @@ export const LoginForm = () => {
     const handleSubmit = async (event: any) => {
         event.preventDefault();
 
-        axios.post("http://localhost:7070/api/v1/auth", credentials)
+        axios.post("http://localhost:7070/api/v1/auth", credentials, { withCredentials: true })
             .then(() => router.push("../"))
             .catch(error => setErrorMessage(error.response.data.message))
     };
