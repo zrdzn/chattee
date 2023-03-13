@@ -2,6 +2,8 @@ import {useEffect, useState} from "react";
 import Link from "next/link";
 import {Dropdown} from "./Dropdown";
 import axios from "axios";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faComments, faUserPlus, faUser} from "@fortawesome/free-solid-svg-icons"
 
 export const Navbar = () => {
     const [navbar, setNavbar] = useState(false);
@@ -57,19 +59,22 @@ export const Navbar = () => {
                     <div>
                         <div className={`flex-1 justify-self-center pb-3 mt-8 md:block md:pb-0 md:mt-0 ${navbar ? 'block' : 'hidden'}`}>
                             <ul className="items-center justify-center space-y-8 md:flex md:space-x-10 md:space-y-0">
-                                <li className="text-white">
+                                <li className="text-white space-x-2">
+                                    <FontAwesomeIcon icon={faComments} />
                                     <Link href="../discussions">Discussions</Link>
                                 </li>
                                 {username ?
-                                    <li className="text-white">
+                                    <li className="text-white font-semibold">
                                         <Dropdown username={username} />
                                     </li>
                                     :
                                     <>
-                                        <li className="text-white">
+                                        <li className="text-white space-x-2">
+                                            <FontAwesomeIcon icon={faUserPlus} />
                                             <Link href="../account/register">Sign up</Link>
                                         </li>
-                                        <li className="text-white">
+                                        <li className="text-white space-x-2">
+                                            <FontAwesomeIcon icon={faUser} />
                                             <Link href="../account/login">Sign in</Link>
                                         </li>
                                     </>

@@ -1,14 +1,14 @@
 import { Menu, Transition } from '@headlessui/react'
 import { Fragment } from 'react'
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import { faRightFromBracket } from '@fortawesome/free-solid-svg-icons'
+import {faRightFromBracket} from '@fortawesome/free-solid-svg-icons'
 
 export const Dropdown = ({ username }: any) => {
     return (
             <Menu as="div"
-                  className="relative inline-block text-left">
+                  className="relative">
                 <div>
-                    <Menu.Button className="inline-flex w-full justify-center bg-opacity-20 px-4 py-2 hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
+                    <Menu.Button className="justify-center bg-opacity-20 hover:bg-opacity-30 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75">
                         {username}
                     </Menu.Button>
                 </div>
