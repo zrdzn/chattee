@@ -48,7 +48,6 @@ public class PrivilegeEndpoints {
                     @OpenApiParam(
                             name = "Authorization",
                             description = "Authorization token",
-                            required = true,
                             example = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
                     )
             },
@@ -93,7 +92,6 @@ public class PrivilegeEndpoints {
                     @OpenApiParam(
                             name = "Authorization",
                             description = "Authorization token",
-                            required = true,
                             example = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
                     )
             },
@@ -136,7 +134,6 @@ public class PrivilegeEndpoints {
                     @OpenApiParam(
                             name = "Authorization",
                             description = "Authorization token",
-                            required = true,
                             example = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
                     )
             },

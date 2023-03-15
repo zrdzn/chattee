@@ -110,7 +110,6 @@ public class AuthEndpoints {
                     @OpenApiParam(
                             name = "Authorization",
                             description = "Authorization token",
-                            required = true,
                             example = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
                     )
             },

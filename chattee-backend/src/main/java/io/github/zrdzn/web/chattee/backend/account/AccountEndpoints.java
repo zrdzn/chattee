@@ -90,7 +90,6 @@ public class AccountEndpoints {
                     @OpenApiParam(
                             name = "Authorization",
                             description = "Authorization token",
-                            required = true,
                             example = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
                     )
             },
@@ -125,7 +124,6 @@ public class AccountEndpoints {
                     @OpenApiParam(
                             name = "Authorization",
                             description = "Authorization token",
-                            required = true,
                             example = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
                     )
             },
@@ -171,7 +169,6 @@ public class AccountEndpoints {
                     @OpenApiParam(
                             name = "Authorization",
                             description = "Authorization token",
-                            required = true,
                             example = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
                     )
             },

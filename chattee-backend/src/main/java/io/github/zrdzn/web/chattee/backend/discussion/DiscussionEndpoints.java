@@ -45,7 +45,6 @@ public class DiscussionEndpoints {
                     @OpenApiParam(
                             name = "Authorization",
                             description = "Authorization token",
-                            required = true,
                             example = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
                     )
             },
@@ -95,7 +94,6 @@ public class DiscussionEndpoints {
                     @OpenApiParam(
                             name = "Authorization",
                             description = "Authorization token",
-                            required = true,
                             example = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
                     )
             },
@@ -130,7 +128,6 @@ public class DiscussionEndpoints {
                     @OpenApiParam(
                             name = "Authorization",
                             description = "Authorization token",
-                            required = true,
                             example = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
                     )
             },
@@ -176,7 +173,6 @@ public class DiscussionEndpoints {
                     @OpenApiParam(
                             name = "Authorization",
                             description = "Bearer authorization token",
-                            required = true,
                             example = "Bearer <your-token>"
                     )
             },
