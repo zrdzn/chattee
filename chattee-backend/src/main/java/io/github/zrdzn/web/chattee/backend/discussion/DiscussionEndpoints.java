@@ -71,14 +71,14 @@ public class DiscussionEndpoints {
     @Post(ENDPOINT)
     public void createDiscussion(Context context) {
         this.authService.authorizeFor(context, RoutePrivilege.DISCUSSION_OPEN)
-                .peek(session -> bodyAsClass(context, DiscussionCreateDto.class, "Discussion body is empty or invalid.")
+                .peek(authDetails -> bodyAsClass(context, DiscussionCreateDto.class, "Discussion body is empty or invalid.")
                         .filterNot(discussion -> StringUtils.isEmpty(discussion.getTitle()), ignored -> badRequest("'title' must not be null."))
                         .filter(discussion -> discussion.getTitle().length() > 3, ignored -> badRequest("'title' must be longer than 3 characters."))
                         .filter(discussion -> discussion.getTitle().length() < 31, ignored -> badRequest("'title' must be shorter than 101 characters."))
                         .filterNot(discussion -> StringUtils.isEmpty(discussion.getDescription()), ignored -> badRequest("'description' must not be null."))
                         .filter(discussion -> discussion.getDescription().length() > 10, ignored -> badRequest("'description' must be longer than 10 characters."))
                         .filter(discussion -> discussion.getDescription().length() < 2001, ignored -> badRequest("'description' must be shorter than 2001 characters."))
-                        .flatMap(discussion -> this.discussionService.createDiscussion(discussion, session.getAccountId()))
+                        .flatMap(discussion -> this.discussionService.createDiscussion(discussion, authDetails.getAccountId()))
                         .peek(discussion -> context.status(HttpStatus.CREATED).json(discussion))
                         .onError(error -> context.status(error.code()).json(error)))
                 .onError(error -> context.status(error.code()).json(error));
@@ -112,7 +112,7 @@ public class DiscussionEndpoints {
     @Get(ENDPOINT)
     public void getAllDiscussions(Context context) {
         this.authService.authorizeFor(context, RoutePrivilege.DISCUSSION_VIEW_ALL)
-                .peek(session -> this.discussionService.getAllDiscussions()
+                .peek(authDetails -> this.discussionService.getAllDiscussions()
                         .peek(discussions -> context.status(HttpStatus.OK).json(discussions))
                         .onError(error -> context.status(error.code()).json(error)))
                 .onError(error -> context.status(error.code()).json(error));
@@ -156,7 +156,7 @@ public class DiscussionEndpoints {
     @Get(ENDPOINT + "/{id}")
     public void getDiscussion(Context context) {
         this.authService.authorizeFor(context, RoutePrivilege.DISCUSSION_VIEW)
-                .peek(session -> pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
+                .peek(authDetails -> pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
                         .flatMap(this.discussionService::getDiscussion)
                         .peek(discussion -> context.status(HttpStatus.OK).json(discussion))
                         .onError(error -> context.status(error.code()).json(error)))
@@ -196,7 +196,7 @@ public class DiscussionEndpoints {
     @Delete(ENDPOINT + "/{id}")
     public void removeDiscussion(Context context) {
         this.authService.authorizeFor(context, RoutePrivilege.DISCUSSION_DELETE)
-                .peek(session -> pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
+                .peek(authDetails -> pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
                         .flatMap(this.discussionService::removeDiscussion)
                         .peek(ignored -> context.status(HttpStatus.OK).json(ok("Discussion has been removed.")))
                         .onError(error -> context.status(error.code()).json(error)))

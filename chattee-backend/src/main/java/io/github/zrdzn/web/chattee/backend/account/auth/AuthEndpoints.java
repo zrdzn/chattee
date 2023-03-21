@@ -5,8 +5,8 @@ import java.time.temporal.ChronoUnit;
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import io.github.zrdzn.web.chattee.backend.account.Account;
 import io.github.zrdzn.web.chattee.backend.account.AccountService;
-import io.github.zrdzn.web.chattee.backend.account.session.Session;
-import io.github.zrdzn.web.chattee.backend.account.session.SessionService;
+import io.github.zrdzn.web.chattee.backend.account.auth.details.AuthDetails;
+import io.github.zrdzn.web.chattee.backend.account.auth.details.AuthDetailsCreateDto;
 import io.github.zrdzn.web.chattee.backend.web.HttpResponse;
 import io.github.zrdzn.web.chattee.backend.web.security.RoutePrivilege;
 import io.javalin.community.routing.annotations.Endpoints;
@@ -24,7 +24,6 @@ import panda.std.Result;
 import panda.utilities.StringUtils;
 
 import static io.github.zrdzn.web.chattee.backend.web.ContextExtensions.bodyAsClass;
-import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.accepted;
 import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.badRequest;
 import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.unauthorized;
 
@@ -34,28 +33,26 @@ public class AuthEndpoints {
     public static final String ENDPOINT = "/api/v1/auth";
 
     private final AccountService accountService;
-    private final SessionService sessionService;
     private final AuthService authService;
 
-    public AuthEndpoints(AccountService accountService, SessionService sessionService, AuthService authService) {
+    public AuthEndpoints(AccountService accountService, AuthService authService) {
         this.accountService = accountService;
-        this.sessionService = sessionService;
         this.authService = authService;
     }
 
     @OpenApi(
             path = ENDPOINT,
             methods = { HttpMethod.POST },
-            summary = "Create an authorization token",
-            description = "Creates an authorization token and returns it",
+            summary = "Create a session",
+            description = "Creates a session",
             tags = { "Auth" },
             requestBody = @OpenApiRequestBody(
                     content = @OpenApiContent(from = AuthCredentials.class)
             ),
             responses = {
                     @OpenApiResponse(
-                            status = "202",
-                            description = "Token that is used for authorizations",
+                            status = "204",
+                            description = "Successfully set token in session's attributes",
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     ),
                     @OpenApiResponse(
@@ -74,7 +71,7 @@ public class AuthEndpoints {
         bodyAsClass(context, AuthCredentials.class, "Authentication body is empty or invalid.")
                 .filterNot(credentials -> StringUtils.isEmpty(credentials.getEmail()), ignored -> badRequest("'email' must not be empty."))
                 .filterNot(credentials -> StringUtils.isEmpty(credentials.getPassword()), ignored -> badRequest("'password' must not be empty."))
-                .flatMap(credentials -> {
+                .map(credentials -> {
                     Result<Account, HttpResponse> accountMaybe = this.accountService.getAccount(credentials.getEmail());
                     if (accountMaybe.isErr()) {
                         return Result.error(accountMaybe.getError());
@@ -86,17 +83,9 @@ public class AuthEndpoints {
                         return Result.error(unauthorized("Provided password is invalid."));
                     }
 
-                    Session session = new Session(account.getId(), Instant.now().plus(7, ChronoUnit.DAYS), context.ip());
-
-                    Result<Session, HttpResponse> createSessionResult = this.sessionService.createSession(session);
-                    if (createSessionResult.isErr()) {
-                        return Result.error(unauthorized(createSessionResult.getError().message()));
-                    }
-
-                    return createSessionResult;
-                }).peek(session -> context.status(HttpStatus.ACCEPTED)
-                        .json(accepted(session.getToken()))
-                        .sessionAttribute("tokenid", session.getToken()))
+                    return new AuthDetailsCreateDto(account.getId(), Instant.now().plus(7, ChronoUnit.DAYS), context.ip());
+                }).map(authDetailsCreateDto -> this.authService.authenticate(context, (AuthDetailsCreateDto) authDetailsCreateDto))
+                .peek(authenticateResult -> context.status(HttpStatus.NO_CONTENT))
                 .onError(error -> context.status(error.code()).json(error));
     }
 
@@ -117,7 +106,7 @@ public class AuthEndpoints {
                     @OpenApiResponse(
                             status = "200",
                             description = "Resulted session details",
-                            content = { @OpenApiContent(from = Session.class) }
+                            content = { @OpenApiContent(from = AuthDetails.class) }
                     ),
                     @OpenApiResponse(
                             status = "401",
@@ -127,8 +116,41 @@ public class AuthEndpoints {
             })
     @Get(ENDPOINT + "/me")
     public void getSessionDetails(Context context) {
-        this.authService.authorizeFor(context, RoutePrivilege.SESSION_DETAILS_VIEW)
-                .peek(session -> context.status(HttpStatus.OK).json(session))
+        this.authService.authorizeFor(context, RoutePrivilege.AUTH_DETAILS_VIEW)
+                .peek(authDetails -> context.status(HttpStatus.OK).json(authDetails))
+                .onError(error -> context.status(error.code()).json(error));
+    }
+
+    @OpenApi(
+            path = ENDPOINT + "/invalidate",
+            methods = { HttpMethod.POST },
+            summary = "Invalidate session",
+            description = "Invalidates session",
+            tags = { "Auth" },
+            headers = {
+                    @OpenApiParam(
+                            name = "Authorization",
+                            description = "Authorization token",
+                            example = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+                    )
+            },
+            responses = {
+                    @OpenApiResponse(
+                            status = "204",
+                            description = "Session is successfully invalidated",
+                            content = { @OpenApiContent(from = HttpResponse.class) }
+                    ),
+                    @OpenApiResponse(
+                            status = "401",
+                            description = "Error message caused by unauthorized access",
+                            content = { @OpenApiContent(from = HttpResponse.class) }
+                    )
+            })
+    @Post(ENDPOINT + "/invalidate")
+    public void invalidateSession(Context context) {
+        this.authService.authorizeFor(context)
+                .flatMap(authDetails -> this.authService.invalidate(context, authDetails.getToken()))
+                .peek(blank -> context.status(HttpStatus.NO_CONTENT))
                 .onError(error -> context.status(error.code()).json(error));
     }
 

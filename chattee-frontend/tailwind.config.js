@@ -10,5 +10,14 @@ module.exports = {
       '2xl': '1536px'
     }
   },
-  plugins: [],
+  plugins: [require("daisyui")],
+  daisyui: {
+    styled: false,
+    themes: false,
+    base: false,
+    utils: false,
+    logs: false,
+    rtl: false,
+    prefix: "",
+  },
 }

@@ -10,18 +10,18 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import io.github.zrdzn.web.chattee.backend.ChatteeConfig;
 import io.github.zrdzn.web.chattee.backend.account.AccountService;
 import io.github.zrdzn.web.chattee.backend.account.auth.AuthService;
+import io.github.zrdzn.web.chattee.backend.account.auth.details.AuthDetailsRepository;
+import io.github.zrdzn.web.chattee.backend.account.auth.details.AuthDetailsService;
+import io.github.zrdzn.web.chattee.backend.account.auth.details.infrastructure.PostgresAuthDetailsRepository;
 import io.github.zrdzn.web.chattee.backend.account.privilege.PrivilegeRepository;
 import io.github.zrdzn.web.chattee.backend.account.privilege.PrivilegeService;
 import io.github.zrdzn.web.chattee.backend.account.privilege.PrivilegeWebConfig;
 import io.github.zrdzn.web.chattee.backend.account.privilege.repositories.PostgresPrivilegeRepository;
-import io.github.zrdzn.web.chattee.backend.account.session.SessionHandler;
+import io.github.zrdzn.web.chattee.backend.account.auth.AuthSessionHandlerFactory;
 import io.github.zrdzn.web.chattee.backend.discussion.DiscussionWebConfig;
 import io.github.zrdzn.web.chattee.backend.storage.postgres.PostgresStorage;
 import io.github.zrdzn.web.chattee.backend.account.AccountWebConfig;
 import io.github.zrdzn.web.chattee.backend.account.auth.AuthWebConfig;
-import io.github.zrdzn.web.chattee.backend.account.session.SessionRepository;
-import io.github.zrdzn.web.chattee.backend.account.session.SessionService;
-import io.github.zrdzn.web.chattee.backend.account.session.infrastructure.PostgresSessionRepository;
 import io.github.zrdzn.web.chattee.backend.web.security.token.AccessTokenService;
 import io.javalin.Javalin;
 import io.javalin.community.routing.annotations.AnnotationsRoutingPlugin;
@@ -57,7 +57,7 @@ public class HttpServer {
                     this.configureOpenApi(config);
                     this.configureSwagger(config);
 
-                    config.jetty.sessionHandler(() -> new SessionHandler().createPostgresSessionHandler(postgresStorage));
+                    config.jetty.sessionHandler(() -> AuthSessionHandlerFactory.createPostgres(postgresStorage));
                 }).events(event -> event.serverStopping(postgresStorage::stop))
                 .exception(JsonParseException.class, (exception, context) ->
                         context.status(HttpStatus.BAD_REQUEST).json(HttpResponse.badRequest("You have provided invalid details.")))
@@ -75,13 +75,13 @@ public class HttpServer {
     private void configureRoutes(JavalinConfig config, PostgresStorage postgresStorage) {
         AnnotationsRoutingPlugin plugin = new AnnotationsRoutingPlugin();
 
-        SessionRepository sessionRepository = new PostgresSessionRepository(postgresStorage);
-        SessionService sessionService = new SessionService(sessionRepository, new AccessTokenService());
-
         PrivilegeRepository privilegeRepository = new PostgresPrivilegeRepository(postgresStorage);
         PrivilegeService privilegeService = new PrivilegeService(privilegeRepository);
 
-        AuthService authService = new AuthService(sessionService, privilegeService);
+        AuthDetailsRepository authDetailsRepository = new PostgresAuthDetailsRepository(postgresStorage);
+        AuthDetailsService authDetailsService = new AuthDetailsService(authDetailsRepository, new AccessTokenService());
+
+        AuthService authService = new AuthService(authDetailsService, privilegeService);
 
         AccountWebConfig accountWebConfig = new AccountWebConfig(postgresStorage, authService);
         accountWebConfig.initialize(plugin);
@@ -91,7 +91,7 @@ public class HttpServer {
 
         new DiscussionWebConfig(postgresStorage, authService).initialize(plugin);
 
-        new AuthWebConfig(accountService, sessionService, authService).initialize(plugin);
+        new AuthWebConfig(accountService, authService).initialize(plugin);
 
         config.plugins.register(plugin);
     }

@@ -108,7 +108,7 @@ public class AccountEndpoints {
     @Get(ACCOUNT_ENDPOINT)
     public void getAllAccounts(Context context) {
         this.authService.authorizeFor(context, RoutePrivilege.ACCOUNT_VIEW_ALL)
-                .peek(session -> this.accountService.getAllAccounts()
+                .peek(authDetails -> this.accountService.getAllAccounts()
                         .peek(accounts -> context.status(HttpStatus.OK).json(accounts))
                         .onError(error -> context.status(error.code()).json(error)))
                 .onError(error -> context.status(error.code()).json(error));
@@ -152,7 +152,7 @@ public class AccountEndpoints {
     @Get(ACCOUNT_ENDPOINT + "/{id}")
     public void getAccount(Context context) {
         this.authService.authorizeFor(context, RoutePrivilege.ACCOUNT_VIEW)
-                .peek(session -> pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
+                .peek(authDetails -> pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
                         .flatMap(this.accountService::getAccount)
                         .peek(accountDetails -> context.status(HttpStatus.OK).json(accountDetails))
                         .onError(error -> context.status(error.code()).json(error)))
@@ -192,7 +192,7 @@ public class AccountEndpoints {
     @Delete(ACCOUNT_ENDPOINT + "/{id}")
     public void removeAccount(Context context) {
         this.authService.authorizeFor(context, RoutePrivilege.ACCOUNT_DELETE)
-                .peek(session -> pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
+                .peek(authDetails -> pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
                         .flatMap(this.accountService::removeAccount)
                         .peek(ignored -> context.status(HttpStatus.OK).json(ok("Account has been removed.")))
                         .onError(error -> context.status(error.code()).json(error)))

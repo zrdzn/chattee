@@ -53,21 +53,21 @@ create table if not exists accounts_privileges
 alter table accounts_privileges
     owner to chattee;
 
-create table if not exists sessions
+create table if not exists auth_details
 (
     token      varchar                 not null
-        constraint sessions_pk
+        constraint auth_details_pk
             primary key,
     account_id    bigint                  not null
-        constraint sessions_account_id_fk
+        constraint auth_details_account_id_fk
             references accounts,
     expire_at  timestamp               not null,
     created_at timestamp default now() not null,
     ip_address varchar                 not null
 );
 
-alter table sessions
+alter table auth_details
     owner to chattee;
 
-create unique index if not exists sessions_token_uindex
-    on sessions (token);
+create unique index if not exists auth_details_token_uindex
+    on auth_details (token);

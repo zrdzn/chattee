@@ -117,7 +117,7 @@ public class PrivilegeEndpoints {
     @Get(PRIVILEGE_ENDPOINT + "/{accountId}")
     public void getAllPrivilegesByAccountId(Context context) {
         this.authService.authorizeFor(context, RoutePrivilege.ACCOUNT_PRIVILEGE_VIEW_ALL)
-                .peek(session -> pathParamAsLong(context, "accountId", "Specified identifier is not a valid long number.")
+                .peek(authDetails -> pathParamAsLong(context, "accountId", "Specified identifier is not a valid long number.")
                         .flatMap(this.privilegeService::getPrivilegesByAccountId)
                         .peek(privileges -> context.status(HttpStatus.OK).json(privileges))
                         .onError(error -> context.status(error.code()).json(error)))

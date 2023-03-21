@@ -2,13 +2,15 @@ package io.github.zrdzn.web.chattee.backend.account.auth;
 
 import java.util.List;
 import java.util.Optional;
+import io.github.zrdzn.web.chattee.backend.account.auth.details.AuthDetails;
+import io.github.zrdzn.web.chattee.backend.account.auth.details.AuthDetailsCreateDto;
+import io.github.zrdzn.web.chattee.backend.account.auth.details.AuthDetailsService;
 import io.github.zrdzn.web.chattee.backend.account.privilege.Privilege;
 import io.github.zrdzn.web.chattee.backend.account.privilege.PrivilegeService;
-import io.github.zrdzn.web.chattee.backend.account.session.Session;
-import io.github.zrdzn.web.chattee.backend.account.session.SessionService;
 import io.github.zrdzn.web.chattee.backend.web.HttpResponse;
 import io.github.zrdzn.web.chattee.backend.web.security.RoutePrivilege;
 import io.javalin.http.Context;
+import panda.std.Blank;
 import panda.std.Result;
 
 import static io.github.zrdzn.web.chattee.backend.web.ContextExtensions.extractTokenFromContext;
@@ -17,29 +19,35 @@ import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.unauthorized;
 
 public class AuthService {
 
-    private final SessionService sessionService;
+    private final AuthDetailsService authDetailsService;
     private final PrivilegeService privilegeService;
 
-    public AuthService(SessionService sessionService, PrivilegeService privilegeService) {
-        this.sessionService = sessionService;
+    public AuthService(AuthDetailsService authDetailsService, PrivilegeService privilegeService) {
+        this.authDetailsService = authDetailsService;
         this.privilegeService = privilegeService;
     }
 
-    public Result<Session, HttpResponse> authorizeFor(Context context, RoutePrivilege... routePrivileges) {
+    public Result<String, HttpResponse> authenticate(Context context, AuthDetailsCreateDto authDetailsCreateDto) {
+        return this.authDetailsService.createAuthDetails(authDetailsCreateDto)
+                .map(AuthDetails::getToken)
+                .peek(token -> context.sessionAttribute("tokenid", token));
+    }
+
+    public Result<AuthDetails, HttpResponse> authorizeFor(Context context, RoutePrivilege... routePrivileges) {
         Optional<String> token = extractTokenFromContext(context);
         if (token.isEmpty()) {
             return Result.error(unauthorized("You must provide an access token."));
         }
 
-        Result<Session, HttpResponse> sessionResult = this.sessionService.getSession(token.get());
-        if (sessionResult.isErr()) {
-            return Result.error(unauthorized(sessionResult.getError().message()));
+        Result<AuthDetails, HttpResponse> authDetailsResult = this.authDetailsService.getAuthDetailsByToken(token.get());
+        if (authDetailsResult.isErr()) {
+            return Result.error(unauthorized(authDetailsResult.getError().message()));
         }
 
-        Session session = sessionResult.get();
+        AuthDetails authDetails = authDetailsResult.get();
 
         if (routePrivileges.length > 0) {
-            Result<List<Privilege>, HttpResponse> privilegesResult = this.privilegeService.getPrivilegesByAccountId(session.getAccountId());
+            Result<List<Privilege>, HttpResponse> privilegesResult = this.privilegeService.getPrivilegesByAccountId(authDetails.getAccountId());
             if (privilegesResult.isErr()) {
                 return Result.error(forbidden(privilegesResult.getError().message()));
             }
@@ -58,7 +66,12 @@ public class AuthService {
             }
         }
 
-        return Result.ok(session);
+        return Result.ok(authDetails);
+    }
+
+    public Result<Blank, HttpResponse> invalidate(Context context, String token) {
+        return this.authDetailsService.removeAuthDetails(token)
+                .peek(blank -> context.req().getSession().invalidate());
     }
 
 }

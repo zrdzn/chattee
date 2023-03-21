@@ -1,15 +1,16 @@
-package io.github.zrdzn.web.chattee.backend.account.session;
+package io.github.zrdzn.web.chattee.backend.account.auth;
 
 import io.github.zrdzn.web.chattee.backend.storage.postgres.PostgresStorage;
 import org.eclipse.jetty.server.session.DatabaseAdaptor;
 import org.eclipse.jetty.server.session.DefaultSessionCache;
 import org.eclipse.jetty.server.session.JDBCSessionDataStoreFactory;
 import org.eclipse.jetty.server.session.SessionCache;
+import org.eclipse.jetty.server.session.SessionHandler;
 
-public class SessionHandler {
+public class AuthSessionHandlerFactory {
 
-    public org.eclipse.jetty.server.session.SessionHandler createPostgresSessionHandler(PostgresStorage storage) {
-        org.eclipse.jetty.server.session.SessionHandler sessionHandler = new org.eclipse.jetty.server.session.SessionHandler();
+    public static SessionHandler createPostgres(PostgresStorage storage) {
+        SessionHandler sessionHandler = new SessionHandler();
 
         SessionCache sessionCache = new DefaultSessionCache(sessionHandler);
 

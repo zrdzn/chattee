@@ -3,6 +3,7 @@ package io.github.zrdzn.web.chattee.backend.discussion;
 import java.util.List;
 import io.github.zrdzn.web.chattee.backend.shared.DomainError;
 import io.github.zrdzn.web.chattee.backend.web.HttpResponse;
+import org.tinylog.Logger;
 import panda.std.Blank;
 import panda.std.Result;
 
@@ -21,6 +22,7 @@ public class DiscussionService {
 
     public Result<Discussion, HttpResponse> createDiscussion(DiscussionCreateDto discussionCreateDto, long authorId) {
         return this.discussionRepository.saveDiscussion(new Discussion(discussionCreateDto, authorId))
+                .peek(discussion -> Logger.info("New discussion has been created. Discussion: {}", discussion))
                 .mapErr(error -> {
                     if (error == DomainError.DISCUSSION_ALREADY_EXISTS) {
                         return conflict("Discussion already exists.");
