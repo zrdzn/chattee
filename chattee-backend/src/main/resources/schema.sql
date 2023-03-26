@@ -3,11 +3,11 @@ create table if not exists accounts
     id         bigserial
         constraint users_pk
             primary key,
+    created_at timestamp not null,
+    updated_at timestamp not null,
     email      varchar(50)             not null,
     password   varchar                 not null,
-    username   varchar                 not null,
-    created_at timestamp default now() not null,
-    updated_at timestamp default now() not null
+    username   varchar                 not null
 );
 
 alter table accounts
@@ -25,7 +25,7 @@ create unique index if not exists accounts_username_uindex
 create table if not exists discussions
 (
     id bigserial constraint discussions_pk primary key,
-    created_at timestamp not null default now(),
+    created_at timestamp not null,
     title       varchar(100)  not null,
     description varchar(2000) not null,
     author_id   bigserial
@@ -57,11 +57,11 @@ create table if not exists auth_details
     token      varchar                 not null
         constraint auth_details_pk
             primary key,
+    created_at timestamp not null,
     account_id    bigint                  not null
         constraint auth_details_account_id_fk
             references accounts,
     expire_at  timestamp               not null,
-    created_at timestamp default now() not null,
     ip_address varchar                 not null
 );
 

@@ -21,11 +21,11 @@ public class AccountService {
         this.accountRepository = accountRepository;
     }
 
-    public Result<Account, HttpResponse> registerAccount(AccountRegisterDto accountRegisterDto) {
-        String password = BCrypt.withDefaults().hashToString(10, accountRegisterDto.getRawPassword().toCharArray());
-        Account account = new Account(accountRegisterDto.getEmail(), password, accountRegisterDto.getUsername());
+    public Result<Account, HttpResponse> registerAccount(AccountCreateRequest accountCreateRequest) {
+        String password = BCrypt.withDefaults().hashToString(10, accountCreateRequest.getPassword().toCharArray());
+        accountCreateRequest.setPassword(password);
 
-        return this.accountRepository.saveAccount(account)
+        return this.accountRepository.saveAccount(accountCreateRequest)
                 .mapErr(error -> {
                     if (error == DomainError.ACCOUNT_ALREADY_EXISTS) {
                         return conflict("Account already exists.");

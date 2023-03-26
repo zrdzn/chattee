@@ -49,7 +49,7 @@ public class DiscussionEndpoints {
                     )
             },
             requestBody = @OpenApiRequestBody(
-                    content = @OpenApiContent(from = DiscussionCreateDto.class)
+                    content = @OpenApiContent(from = DiscussionCreateRequest.class)
             ),
             responses = {
                     @OpenApiResponse(
@@ -71,7 +71,7 @@ public class DiscussionEndpoints {
     @Post(ENDPOINT)
     public void createDiscussion(Context context) {
         this.authService.authorizeFor(context, RoutePrivilege.DISCUSSION_OPEN)
-                .peek(authDetails -> bodyAsClass(context, DiscussionCreateDto.class, "Discussion body is empty or invalid.")
+                .peek(authDetails -> bodyAsClass(context, DiscussionCreateRequest.class, "Discussion body is empty or invalid.")
                         .filterNot(discussion -> StringUtils.isEmpty(discussion.getTitle()), ignored -> badRequest("'title' must not be null."))
                         .filter(discussion -> discussion.getTitle().length() > 3, ignored -> badRequest("'title' must be longer than 3 characters."))
                         .filter(discussion -> discussion.getTitle().length() < 31, ignored -> badRequest("'title' must be shorter than 101 characters."))

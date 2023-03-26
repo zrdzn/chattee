@@ -1,17 +1,17 @@
 package io.github.zrdzn.web.chattee.backend.account;
 
-public class AccountRegisterDto {
+public class AccountCreateRequest {
 
     private String email;
-    private String rawPassword;
+    private String password;
     private String username;
 
-    public AccountRegisterDto() {
+    public AccountCreateRequest() {
     }
 
-    public AccountRegisterDto(String email, String rawPassword, String username) {
+    public AccountCreateRequest(String email, String password, String username) {
         this.email = email;
-        this.rawPassword = rawPassword;
+        this.password = password;
         this.username = username;
     }
 
@@ -23,12 +23,12 @@ public class AccountRegisterDto {
         this.email = email;
     }
 
-    public String getRawPassword() {
-        return this.rawPassword;
+    public String getPassword() {
+        return this.password;
     }
 
-    public void setRawPassword(String rawPassword) {
-        this.rawPassword = rawPassword;
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public String getUsername() {

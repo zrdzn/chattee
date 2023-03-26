@@ -5,23 +5,19 @@ import java.time.Instant;
 public class AuthDetails {
 
     private String token;
+    private Instant createdAt;
     private long accountId;
     private Instant expireAt;
-    private Instant createdAt;
     private String ipAddress;
 
     public AuthDetails() {
     }
 
-    public AuthDetails(String token, long accountId, Instant expireAt, String ipAddress) {
-        this(token, accountId, expireAt, null, ipAddress);
-    }
-
-    public AuthDetails(String token, long accountId, Instant expireAt, Instant createdAt, String ipAddress) {
+    public AuthDetails(String token, Instant createdAt, long accountId, Instant expireAt, String ipAddress) {
         this.token = token;
+        this.createdAt = createdAt;
         this.accountId = accountId;
         this.expireAt = expireAt;
-        this.createdAt = createdAt;
         this.ipAddress = ipAddress;
     }
 
@@ -31,6 +27,14 @@ public class AuthDetails {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public Instant getCreatedAt() {
+        return this.createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
     }
 
     public long getAccountId() {
@@ -47,14 +51,6 @@ public class AuthDetails {
 
     public void setExpireAt(Instant expireAt) {
         this.expireAt = expireAt;
-    }
-
-    public Instant getCreatedAt() {
-        return this.createdAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
     }
 
     public String getIpAddress() {

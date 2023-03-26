@@ -7,7 +7,7 @@ import panda.std.Result;
 
 public interface AuthDetailsRepository {
 
-    Result<AuthDetails, DomainError> saveAuthDetails(AuthDetails authDetails);
+    Result<AuthDetails, DomainError> saveAuthDetails(AuthDetailsCreateRequest authDetailsCreateRequest, String token);
 
     Result<List<AuthDetails>, DomainError> listAllAuthDetailsByAccountId(long id);
 

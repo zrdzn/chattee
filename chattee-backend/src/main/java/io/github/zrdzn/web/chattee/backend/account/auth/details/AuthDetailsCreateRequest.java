@@ -2,16 +2,16 @@ package io.github.zrdzn.web.chattee.backend.account.auth.details;
 
 import java.time.Instant;
 
-public class AuthDetailsCreateDto {
+public class AuthDetailsCreateRequest {
 
     private long accountId;
     private Instant expireAt;
     private String ipAddress;
 
-    public AuthDetailsCreateDto() {
+    public AuthDetailsCreateRequest() {
     }
 
-    public AuthDetailsCreateDto(long accountId, Instant expireAt, String ipAddress) {
+    public AuthDetailsCreateRequest(long accountId, Instant expireAt, String ipAddress) {
         this.accountId = accountId;
         this.expireAt = expireAt;
         this.ipAddress = ipAddress;

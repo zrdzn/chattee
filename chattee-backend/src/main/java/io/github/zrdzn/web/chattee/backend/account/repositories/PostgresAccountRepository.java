@@ -4,10 +4,13 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import io.github.zrdzn.web.chattee.backend.account.Account;
+import io.github.zrdzn.web.chattee.backend.account.AccountCreateRequest;
 import io.github.zrdzn.web.chattee.backend.shared.DomainError;
 import io.github.zrdzn.web.chattee.backend.storage.postgres.PostgresStorage;
 import io.github.zrdzn.web.chattee.backend.account.AccountRepository;
@@ -19,13 +22,13 @@ import panda.std.Result;
 
 public class PostgresAccountRepository implements AccountRepository {
 
-    private static final String INSERT_ACCOUNT = "insert into accounts (email, password, username) values (?, ?, ?);";
+    private static final String INSERT_ACCOUNT = "insert into accounts (created_at, updated_at, email, password, username) values (?, ?, ?, ?, ?);";
     private static final String INSERT_PRIVILEGE = "insert into accounts_privileges (account_id, privilege) values (?, ?);";
 
-    private static final String SELECT_ALL_ACCOUNTS = "select id, email, password, username, created_at, updated_at from accounts;";
+    private static final String SELECT_ALL_ACCOUNTS = "select id, created_at, updated_at, email, password, username from accounts;";
 
-    private static final String SELECT_ACCOUNT_BY_ID = "select email, password, username, created_at, updated_at from accounts where id = ?;";
-    private static final String SELECT_ACCOUNT_BY_EMAIL = "select id, password, username, created_at, updated_at from accounts where email = ?;";
+    private static final String SELECT_ACCOUNT_BY_ID = "select created_at, updated_at, email, password, username from accounts where id = ?;";
+    private static final String SELECT_ACCOUNT_BY_EMAIL = "select id, created_at, updated_at, password, username from accounts where email = ?;";
 
     private static final String DELETE_ACCOUNT_BY_ID = "delete from accounts where id = ?;";
     private static final String DELETE_PRIVILEGE_BY_ID = "delete from accounts_privileges where id = ?;";
@@ -37,16 +40,34 @@ public class PostgresAccountRepository implements AccountRepository {
     }
 
     @Override
-    public Result<Account, DomainError> saveAccount(Account account) {
+    public Result<Account, DomainError> saveAccount(AccountCreateRequest accountCreateRequest) {
         try (Connection connection = this.postgresStorage.getHikariDataSource().getConnection();
-             PreparedStatement statement = connection.prepareStatement(INSERT_ACCOUNT)) {
-            statement.setString(1, account.getEmail());
-            statement.setString(2, account.getPassword());
-            statement.setString(3, account.getUsername());
+             PreparedStatement statement = connection.prepareStatement(INSERT_ACCOUNT, Statement.RETURN_GENERATED_KEYS)) {
+            Instant createdAt = Instant.now();
 
+            statement.setTimestamp(1, Timestamp.from(createdAt));
+            statement.setTimestamp(2, Timestamp.from(createdAt));
+            statement.setString(3, accountCreateRequest.getEmail());
+            statement.setString(4, accountCreateRequest.getPassword());
+            statement.setString(5, accountCreateRequest.getUsername());
             statement.executeUpdate();
 
-            return Result.ok(account);
+            long id = 0L;
+            ResultSet generatedKeys = statement.getGeneratedKeys();
+            if (generatedKeys.next()) {
+                id = generatedKeys.getLong(1);
+            }
+
+            return Result.ok(
+                    new Account(
+                            id,
+                            createdAt,
+                            createdAt,
+                            accountCreateRequest.getEmail(),
+                            accountCreateRequest.getPassword(),
+                            accountCreateRequest.getUsername()
+                    )
+            );
         } catch (SQLException exception) {
             String state = exception.getSQLState();
             if (state.equalsIgnoreCase(PSQLState.UNIQUE_VIOLATION.getState())) {
@@ -89,13 +110,13 @@ public class PostgresAccountRepository implements AccountRepository {
             ResultSet result = statement.executeQuery();
             while (result.next()) {
                 long id = result.getLong("id");
+                Instant createdAt = result.getTimestamp("created_at").toInstant();
+                Instant updatedAt = result.getTimestamp("updated_at").toInstant();
                 String email = result.getString("email");
                 String password = result.getString("password");
                 String username = result.getString("username");
-                Instant createdAt = result.getTimestamp("created_at").toInstant();
-                Instant updatedAt = result.getTimestamp("updated_at").toInstant();
 
-                accounts.add(new Account(id, email, password, username, createdAt, updatedAt));
+                accounts.add(new Account(id, createdAt, updatedAt, email, password, username));
             }
 
             return Result.ok(accounts);
@@ -115,13 +136,13 @@ public class PostgresAccountRepository implements AccountRepository {
                 return Result.error(DomainError.ACCOUNT_NOT_EXISTS);
             }
 
+            Instant createdAt = result.getTimestamp("created_at").toInstant();
+            Instant updatedAt = result.getTimestamp("updated_at").toInstant();
             String email = result.getString("email");
             String password = result.getString("password");
             String username = result.getString("username");
-            Instant createdAt = result.getTimestamp("created_at").toInstant();
-            Instant updatedAt = result.getTimestamp("updated_at").toInstant();
 
-            return Result.ok(new Account(id, email, password, username, createdAt, updatedAt));
+            return Result.ok(new Account(id, createdAt, updatedAt, email, password, username));
         } catch (SQLException exception) {
             Logger.error(exception, "Could not find account.");
             return Result.error(DomainError.SQL_EXCEPTION);
@@ -139,12 +160,12 @@ public class PostgresAccountRepository implements AccountRepository {
             }
 
             long id = result.getLong("id");
-            String password = result.getString("password");
-            String username = result.getString("username");
             Instant createdAt = result.getTimestamp("created_at").toInstant();
             Instant updatedAt = result.getTimestamp("updated_at").toInstant();
+            String password = result.getString("password");
+            String username = result.getString("username");
 
-            return Result.ok(new Account(id, email, password, username, createdAt, updatedAt));
+            return Result.ok(new Account(id, createdAt, updatedAt, email, password, username));
         } catch (SQLException exception) {
             Logger.error(exception, "Could not find account.");
             return Result.error(DomainError.SQL_EXCEPTION);

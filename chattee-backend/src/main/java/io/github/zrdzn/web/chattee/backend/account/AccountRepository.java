@@ -8,7 +8,7 @@ import panda.std.Result;
 
 public interface AccountRepository {
 
-    Result<Account, DomainError> saveAccount(Account account);
+    Result<Account, DomainError> saveAccount(AccountCreateRequest accountCreateRequest);
 
     Result<Privilege, DomainError> savePrivilege(Privilege privilege);
 

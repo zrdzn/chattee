@@ -49,7 +49,7 @@ public class AccountEndpoints {
             description = "Registers an account and returns it",
             tags = { "Account" },
             requestBody = @OpenApiRequestBody(
-                    content = @OpenApiContent(from = AccountRegisterDto.class)
+                    content = @OpenApiContent(from = AccountCreateRequest.class)
             ),
             responses = {
                     @OpenApiResponse(
@@ -65,13 +65,13 @@ public class AccountEndpoints {
             })
     @Post(ACCOUNT_ENDPOINT + "/register")
     public void registerAccount(Context context) {
-        bodyAsClass(context, AccountRegisterDto.class, "Account body is empty or invalid.")
+        bodyAsClass(context, AccountCreateRequest.class, "Account body is empty or invalid.")
                 .filter(account -> account.getEmail() != null, ignored -> badRequest("'email' must not be null."))
                 .filter(account -> validateEmail(account.getEmail()), ignored -> badRequest("'email' is not a valid email."))
                 .filter(account -> account.getEmail().length() < 65, ignored -> badRequest("'email' must be shorter than 65 characters."))
-                .filterNot(account -> StringUtils.isEmpty(account.getRawPassword()), ignored -> badRequest("'rawPassword' must not be empty."))
-                .filter(account -> account.getRawPassword().length() > 6, ignored -> badRequest("'rawPassword' must be longer than 6 characters."))
-                .filter(account -> account.getRawPassword().length() < 81, ignored -> badRequest("'rawPassword' must be shorter than 81 characters."))
+                .filterNot(account -> StringUtils.isEmpty(account.getPassword()), ignored -> badRequest("'rawPassword' must not be empty."))
+                .filter(account -> account.getPassword().length() > 6, ignored -> badRequest("'rawPassword' must be longer than 6 characters."))
+                .filter(account -> account.getPassword().length() < 81, ignored -> badRequest("'rawPassword' must be shorter than 81 characters."))
                 .filterNot(account -> StringUtils.isEmpty(account.getUsername()), ignored -> badRequest("'username' must not be null."))
                 .filter(account -> account.getUsername().length() > 3, ignored -> badRequest("'username' must be longer than 3 characters."))
                 .filter(account -> account.getUsername().length() < 33, ignored -> badRequest("'username' must be shorter than 33 characters."))

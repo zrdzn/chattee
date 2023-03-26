@@ -6,7 +6,7 @@ import at.favre.lib.crypto.bcrypt.BCrypt;
 import io.github.zrdzn.web.chattee.backend.account.Account;
 import io.github.zrdzn.web.chattee.backend.account.AccountService;
 import io.github.zrdzn.web.chattee.backend.account.auth.details.AuthDetails;
-import io.github.zrdzn.web.chattee.backend.account.auth.details.AuthDetailsCreateDto;
+import io.github.zrdzn.web.chattee.backend.account.auth.details.AuthDetailsCreateRequest;
 import io.github.zrdzn.web.chattee.backend.web.HttpResponse;
 import io.github.zrdzn.web.chattee.backend.web.security.RoutePrivilege;
 import io.javalin.community.routing.annotations.Endpoints;
@@ -83,8 +83,8 @@ public class AuthEndpoints {
                         return Result.error(unauthorized("Provided password is invalid."));
                     }
 
-                    return new AuthDetailsCreateDto(account.getId(), Instant.now().plus(7, ChronoUnit.DAYS), context.ip());
-                }).map(authDetailsCreateDto -> this.authService.authenticate(context, (AuthDetailsCreateDto) authDetailsCreateDto))
+                    return new AuthDetailsCreateRequest(account.getId(), Instant.now().plus(7, ChronoUnit.DAYS), context.ip());
+                }).map(authDetailsCreateDto -> this.authService.authenticate(context, (AuthDetailsCreateRequest) authDetailsCreateDto))
                 .peek(authenticateResult -> context.status(HttpStatus.NO_CONTENT))
                 .onError(error -> context.status(error.code()).json(error));
     }

@@ -2,24 +2,22 @@ package io.github.zrdzn.web.chattee.backend.account;
 
 import java.time.Instant;
 
-public class Account {
+public class AccountDetails {
 
     private long id;
     private Instant createdAt;
     private Instant updatedAt;
     private String email;
-    private String password;
     private String username;
 
-    public Account() {
+    public AccountDetails() {
     }
 
-    public Account(long id, Instant createdAt, Instant updatedAt, String email, String password, String username) {
+    public AccountDetails(long id, Instant createdAt, Instant updatedAt, String email, String username) {
         this.id = id;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.email = email;
-        this.password = password;
         this.username = username;
     }
 
@@ -53,14 +51,6 @@ public class Account {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPassword() {
-        return this.password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getUsername() {

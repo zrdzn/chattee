@@ -21,11 +21,8 @@ public class AuthDetailsService {
         this.accessTokenService = accessTokenService;
     }
 
-    public Result<AuthDetails, HttpResponse> createAuthDetails(AuthDetailsCreateDto createDto) {
-        AuthDetails authDetails = new AuthDetails(this.accessTokenService.createToken(), createDto.getAccountId(),
-                createDto.getExpireAt(), createDto.getIpAddress());
-
-        return this.authDetailsRepository.saveAuthDetails(authDetails)
+    public Result<AuthDetails, HttpResponse> createAuthDetails(AuthDetailsCreateRequest authDetailsCreateRequest) {
+        return this.authDetailsRepository.saveAuthDetails(authDetailsCreateRequest, this.accessTokenService.createToken())
                 .mapErr(error -> {
                     if (error == DomainError.AUTH_DETAILS_ALREADY_EXIST) {
                         return conflict("Auth details already exist.");

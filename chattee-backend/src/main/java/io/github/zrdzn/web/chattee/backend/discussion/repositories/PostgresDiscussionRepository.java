@@ -10,7 +10,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import io.github.zrdzn.web.chattee.backend.discussion.Discussion;
-import io.github.zrdzn.web.chattee.backend.discussion.DiscussionCreateDto;
+import io.github.zrdzn.web.chattee.backend.discussion.DiscussionCreateRequest;
 import io.github.zrdzn.web.chattee.backend.discussion.DiscussionRepository;
 import io.github.zrdzn.web.chattee.backend.shared.DomainError;
 import io.github.zrdzn.web.chattee.backend.storage.postgres.PostgresStorage;
@@ -21,7 +21,7 @@ import panda.std.Result;
 
 public class PostgresDiscussionRepository implements DiscussionRepository {
 
-    private static final String INSERT_DISCUSSION = "insert into discussions (title, created_at, description, author_id) values (?, ?, ?, ?);";
+    private static final String INSERT_DISCUSSION = "insert into discussions (created_at, title, description, author_id) values (?, ?, ?, ?);";
     private static final String SELECT_ALL_DISCUSSIONS = "select id, created_at, title, description, author_id from discussions;";
     private static final String SELECT_DISCUSSION_BY_ID = "select title, description, author_id from discussions where id = ?;";
     private static final String DELETE_DISCUSSION_BY_ID = "delete from discussions where id = ?;";
@@ -32,14 +32,14 @@ public class PostgresDiscussionRepository implements DiscussionRepository {
         this.postgresStorage = postgresStorage;
     }
 
-    public Result<Discussion, DomainError> saveDiscussion(DiscussionCreateDto discussionCreateDto, long authorId) {
+    public Result<Discussion, DomainError> saveDiscussion(DiscussionCreateRequest discussionCreateRequest, long authorId) {
         try (Connection connection = this.postgresStorage.getHikariDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(INSERT_DISCUSSION, Statement.RETURN_GENERATED_KEYS)) {
             Instant createdAt = Instant.now();
 
-            statement.setString(1, discussionCreateDto.getTitle());
-            statement.setTimestamp(2, Timestamp.from(createdAt));
-            statement.setString(3, discussionCreateDto.getDescription());
+            statement.setTimestamp(1, Timestamp.from(createdAt));
+            statement.setString(2, discussionCreateRequest.getTitle());
+            statement.setString(3, discussionCreateRequest.getDescription());
             statement.setLong(4, authorId);
             statement.executeUpdate();
 
@@ -53,8 +53,8 @@ public class PostgresDiscussionRepository implements DiscussionRepository {
                     new Discussion(
                             id,
                             createdAt,
-                            discussionCreateDto.getTitle(),
-                            discussionCreateDto.getDescription(),
+                            discussionCreateRequest.getTitle(),
+                            discussionCreateRequest.getDescription(),
                             authorId
                     )
             );

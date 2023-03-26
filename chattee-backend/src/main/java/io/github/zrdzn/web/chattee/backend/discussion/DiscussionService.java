@@ -23,8 +23,8 @@ public class DiscussionService {
         this.accountService = accountService;
     }
 
-    public Result<DiscussionDetails, HttpResponse> createDiscussion(DiscussionCreateDto discussionCreateDto, long authorId) {
-        return this.discussionRepository.saveDiscussion(discussionCreateDto, authorId)
+    public Result<DiscussionDetails, HttpResponse> createDiscussion(DiscussionCreateRequest discussionCreateRequest, long authorId) {
+        return this.discussionRepository.saveDiscussion(discussionCreateRequest, authorId)
                 .map(discussion ->
                         new DiscussionDetails(
                                 discussion.getId(),

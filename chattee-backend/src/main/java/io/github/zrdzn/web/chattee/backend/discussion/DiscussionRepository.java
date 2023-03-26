@@ -7,7 +7,7 @@ import panda.std.Result;
 
 public interface DiscussionRepository {
 
-    Result<Discussion, DomainError> saveDiscussion(DiscussionCreateDto discussionCreateDto, long authorId);
+    Result<Discussion, DomainError> saveDiscussion(DiscussionCreateRequest discussionCreateRequest, long authorId);
 
     Result<List<Discussion>, DomainError> listAllDiscussions();
 

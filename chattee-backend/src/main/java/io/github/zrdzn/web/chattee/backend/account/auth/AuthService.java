@@ -3,7 +3,7 @@ package io.github.zrdzn.web.chattee.backend.account.auth;
 import java.util.List;
 import java.util.Optional;
 import io.github.zrdzn.web.chattee.backend.account.auth.details.AuthDetails;
-import io.github.zrdzn.web.chattee.backend.account.auth.details.AuthDetailsCreateDto;
+import io.github.zrdzn.web.chattee.backend.account.auth.details.AuthDetailsCreateRequest;
 import io.github.zrdzn.web.chattee.backend.account.auth.details.AuthDetailsService;
 import io.github.zrdzn.web.chattee.backend.account.privilege.Privilege;
 import io.github.zrdzn.web.chattee.backend.account.privilege.PrivilegeService;
@@ -27,8 +27,8 @@ public class AuthService {
         this.privilegeService = privilegeService;
     }
 
-    public Result<String, HttpResponse> authenticate(Context context, AuthDetailsCreateDto authDetailsCreateDto) {
-        return this.authDetailsService.createAuthDetails(authDetailsCreateDto)
+    public Result<String, HttpResponse> authenticate(Context context, AuthDetailsCreateRequest authDetailsCreateRequest) {
+        return this.authDetailsService.createAuthDetails(authDetailsCreateRequest)
                 .map(AuthDetails::getToken)
                 .peek(token -> context.sessionAttribute("tokenid", token));
     }

@@ -1,14 +1,14 @@
 package io.github.zrdzn.web.chattee.backend.discussion;
 
-public class DiscussionCreateDto {
+public class DiscussionCreateRequest {
 
     private String title;
     private String description;
 
-    public DiscussionCreateDto() {
+    public DiscussionCreateRequest() {
     }
 
-    public DiscussionCreateDto(String title, String description) {
+    public DiscussionCreateRequest(String title, String description) {
         this.title = title;
         this.description = description;
     }
