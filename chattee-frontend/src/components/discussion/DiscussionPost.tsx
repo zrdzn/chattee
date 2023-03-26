@@ -1,4 +1,4 @@
-export const DiscussionPost = ({ description, createdDate, replierSignature, authorName, authorAvatarUrl }: any) => {
+export const DiscussionPost = ({ description, createdDate, authorName, authorAvatarUrl }: any) => {
     return (
         <>
             <div className="c-card block bg-white shadow-md hover:shadow-xl rounded-lg overflow-hidden mb-4">

@@ -1,24 +1,25 @@
 package io.github.zrdzn.web.chattee.backend.discussion;
 
 import java.time.Instant;
+import io.github.zrdzn.web.chattee.backend.account.Account;
 
-public class Discussion {
+public class DiscussionDetails {
 
     private long id;
     private Instant createdAt;
     private String title;
     private String description;
-    private long authorId;
+    private Account author;
 
-    public Discussion() {
+    public DiscussionDetails() {
     }
 
-    public Discussion(long id, Instant createdAt, String title, String description, long authorId) {
+    public DiscussionDetails(long id, Instant createdAt, String title, String description, Account author) {
         this.id = id;
         this.createdAt = createdAt;
         this.title = title;
         this.description = description;
-        this.authorId = authorId;
+        this.author = author;
     }
 
     public long getId() {
@@ -53,12 +54,12 @@ public class Discussion {
         this.description = description;
     }
 
-    public long getAuthorId() {
-        return this.authorId;
+    public Account getAuthor() {
+        return this.author;
     }
 
-    public void setAuthorId(long authorId) {
-        this.authorId = authorId;
+    public void setAuthor(Account author) {
+        this.author = author;
     }
 
 }

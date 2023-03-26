@@ -14,11 +14,7 @@ public class AccountDetailsDto {
     }
 
     public AccountDetailsDto(Account account) {
-        this(account.getEmail(), account.getUsername(), account.getCreatedAt(), account.getUpdatedAt());
-    }
-
-    public AccountDetailsDto(String email, String username, Instant createdAt, Instant updatedAt) {
-        this(0L, email, username, createdAt, updatedAt);
+        this(account.getId(), account.getEmail(), account.getUsername(), account.getCreatedAt(), account.getUpdatedAt());
     }
 
     public AccountDetailsDto(long id, String email, String username, Instant createdAt, Instant updatedAt) {

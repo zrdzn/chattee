@@ -1,9 +1,10 @@
 package io.github.zrdzn.web.chattee.backend.discussion;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import io.github.zrdzn.web.chattee.backend.account.AccountService;
 import io.github.zrdzn.web.chattee.backend.shared.DomainError;
 import io.github.zrdzn.web.chattee.backend.web.HttpResponse;
-import org.tinylog.Logger;
 import panda.std.Blank;
 import panda.std.Result;
 
@@ -15,14 +16,24 @@ import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.notFound;
 public class DiscussionService {
 
     private final DiscussionRepository discussionRepository;
+    private final AccountService accountService;
 
-    public DiscussionService(DiscussionRepository discussionRepository) {
+    public DiscussionService(DiscussionRepository discussionRepository, AccountService accountService) {
         this.discussionRepository = discussionRepository;
+        this.accountService = accountService;
     }
 
-    public Result<Discussion, HttpResponse> createDiscussion(DiscussionCreateDto discussionCreateDto, long authorId) {
-        return this.discussionRepository.saveDiscussion(new Discussion(discussionCreateDto, authorId))
-                .peek(discussion -> Logger.info("New discussion has been created. Discussion: {}", discussion))
+    public Result<DiscussionDetails, HttpResponse> createDiscussion(DiscussionCreateDto discussionCreateDto, long authorId) {
+        return this.discussionRepository.saveDiscussion(discussionCreateDto, authorId)
+                .map(discussion ->
+                        new DiscussionDetails(
+                                discussion.getId(),
+                                discussion.getCreatedAt(),
+                                discussion.getTitle(),
+                                discussion.getDescription(),
+                                this.accountService.getAccount(authorId).get()
+                        )
+                )
                 .mapErr(error -> {
                     if (error == DomainError.DISCUSSION_ALREADY_EXISTS) {
                         return conflict("Discussion already exists.");
@@ -34,13 +45,34 @@ public class DiscussionService {
                 });
     }
 
-    public Result<List<Discussion>, HttpResponse> getAllDiscussions() {
+    public Result<List<DiscussionDetails>, HttpResponse> getAllDiscussions() {
         return this.discussionRepository.listAllDiscussions()
+                .map(discussions -> discussions.stream()
+                        .map(discussion ->
+                                new DiscussionDetails(
+                                        discussion.getId(),
+                                        discussion.getCreatedAt(),
+                                        discussion.getTitle(),
+                                        discussion.getDescription(),
+                                        this.accountService.getAccount(discussion.getAuthorId()).get()
+                                )
+                        )
+                        .collect(Collectors.toList())
+                )
                 .mapErr(error -> internalServerError("Could not retrieve all discussions."));
     }
 
-    public Result<Discussion, HttpResponse> getDiscussion(long id) {
+    public Result<DiscussionDetails, HttpResponse> getDiscussion(long id) {
         return this.discussionRepository.findDiscussionById(id)
+                .map(discussion ->
+                        new DiscussionDetails(
+                                discussion.getId(),
+                                discussion.getCreatedAt(),
+                                discussion.getTitle(),
+                                discussion.getDescription(),
+                                this.accountService.getAccount(discussion.getAuthorId()).get()
+                        )
+                )
                 .mapErr(error -> {
                     if (error == DomainError.DISCUSSION_NOT_EXISTS) {
                         return notFound("Discussion does not exist.");

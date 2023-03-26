@@ -1,6 +1,7 @@
 import {DiscussionItem} from "./DiscussionItem";
 import axios from "axios";
 import {useEffect, useState} from "react";
+import {transform} from "../../dateTransformer";
 
 export const DiscussionList = () => {
     const [discussions, setDiscussions] = useState([]);
@@ -35,8 +36,8 @@ export const DiscussionList = () => {
                         title={discussion.title}
                         description={discussion.description}
                         repliesAmount={616}
-                        authorName="zrdzn"
-                        createdDate="January 23, 2023"
+                        authorName={discussion.author.username}
+                        createdDate={transform(discussion.createdAt)}
                         lastReplierName="zrdzn"
                         lastRepliedDate="January 23, 2023"
                     />

@@ -89,7 +89,7 @@ public class HttpServer {
 
         new PrivilegeWebConfig(privilegeService, accountService, authService).initialize(plugin);
 
-        new DiscussionWebConfig(postgresStorage, authService).initialize(plugin);
+        new DiscussionWebConfig(postgresStorage, accountService, authService).initialize(plugin);
 
         new AuthWebConfig(accountService, authService).initialize(plugin);
 

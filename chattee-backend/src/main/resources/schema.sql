@@ -24,9 +24,8 @@ create unique index if not exists accounts_username_uindex
 
 create table if not exists discussions
 (
-    id          bigserial
-        constraint discussions_pk
-            primary key,
+    id bigserial constraint discussions_pk primary key,
+    created_at timestamp not null default now(),
     title       varchar(100)  not null,
     description varchar(2000) not null,
     author_id   bigserial

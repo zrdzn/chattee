@@ -5,9 +5,12 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import io.github.zrdzn.web.chattee.backend.discussion.Discussion;
+import io.github.zrdzn.web.chattee.backend.discussion.DiscussionCreateDto;
 import io.github.zrdzn.web.chattee.backend.discussion.DiscussionRepository;
 import io.github.zrdzn.web.chattee.backend.shared.DomainError;
 import io.github.zrdzn.web.chattee.backend.storage.postgres.PostgresStorage;
@@ -18,8 +21,8 @@ import panda.std.Result;
 
 public class PostgresDiscussionRepository implements DiscussionRepository {
 
-    private static final String INSERT_DISCUSSION = "insert into discussions (title, description, author_id) values (?, ?, ?);";
-    private static final String SELECT_ALL_DISCUSSIONS = "select id, title, description, author_id from discussions;";
+    private static final String INSERT_DISCUSSION = "insert into discussions (title, created_at, description, author_id) values (?, ?, ?, ?);";
+    private static final String SELECT_ALL_DISCUSSIONS = "select id, created_at, title, description, author_id from discussions;";
     private static final String SELECT_DISCUSSION_BY_ID = "select title, description, author_id from discussions where id = ?;";
     private static final String DELETE_DISCUSSION_BY_ID = "delete from discussions where id = ?;";
 
@@ -29,12 +32,15 @@ public class PostgresDiscussionRepository implements DiscussionRepository {
         this.postgresStorage = postgresStorage;
     }
 
-    public Result<Discussion, DomainError> saveDiscussion(Discussion discussion) {
+    public Result<Discussion, DomainError> saveDiscussion(DiscussionCreateDto discussionCreateDto, long authorId) {
         try (Connection connection = this.postgresStorage.getHikariDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(INSERT_DISCUSSION, Statement.RETURN_GENERATED_KEYS)) {
-            statement.setString(1, discussion.getTitle());
-            statement.setString(2, discussion.getDescription());
-            statement.setLong(3, discussion.getAuthorId());
+            Instant createdAt = Instant.now();
+
+            statement.setString(1, discussionCreateDto.getTitle());
+            statement.setTimestamp(2, Timestamp.from(createdAt));
+            statement.setString(3, discussionCreateDto.getDescription());
+            statement.setLong(4, authorId);
             statement.executeUpdate();
 
             long id = 0L;
@@ -43,7 +49,15 @@ public class PostgresDiscussionRepository implements DiscussionRepository {
                 id = generatedKeys.getLong(1);
             }
 
-            return Result.ok(new Discussion(id, discussion.getTitle(), discussion.getDescription(), discussion.getAuthorId()));
+            return Result.ok(
+                    new Discussion(
+                            id,
+                            createdAt,
+                            discussionCreateDto.getTitle(),
+                            discussionCreateDto.getDescription(),
+                            authorId
+                    )
+            );
         } catch (SQLException exception) {
             String state = exception.getSQLState();
             if (state.equalsIgnoreCase(PSQLState.UNIQUE_VIOLATION.getState())) {
@@ -66,11 +80,12 @@ public class PostgresDiscussionRepository implements DiscussionRepository {
             ResultSet result = statement.executeQuery();
             while (result.next()) {
                 long id = result.getLong("id");
+                Instant createdAt = result.getTimestamp("created_at").toInstant();
                 String title = result.getString("title");
                 String description = result.getString("description");
                 long authorId = result.getLong("author_id");
 
-                Discussion discussion = new Discussion(id, title, description, authorId);
+                Discussion discussion = new Discussion(id, createdAt, title, description, authorId);
                 discussions.add(discussion);
             }
 
@@ -93,10 +108,11 @@ public class PostgresDiscussionRepository implements DiscussionRepository {
             }
 
             String title = result.getString("title");
+            Instant createdAt = result.getTimestamp("created_at").toInstant();
             String description = result.getString("description");
             long authorId = result.getLong("author_id");
 
-            Discussion discussion = new Discussion(id, title, description, authorId);
+            Discussion discussion = new Discussion(id, createdAt, title, description, authorId);
 
             return Result.ok(discussion);
         } catch (SQLException exception) {
