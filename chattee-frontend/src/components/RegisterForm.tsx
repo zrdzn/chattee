@@ -16,7 +16,7 @@ export const RegisterForm = () => {
     const handleSubmit = async (event: any) => {
         event.preventDefault();
 
-        axios.post("http://localhost:7070/api/v1/account/register")
+        axios.post("http://localhost:7070/api/v1/accounts/register", credentials)
             .then(() => router.push("../")
                 .then(() => toast.success("You have been successfully registered."))
                 .catch(error => {
@@ -41,13 +41,21 @@ export const RegisterForm = () => {
                     <form method="post" onChange={handleChange} onSubmit={handleSubmit}>
                         <div className="flex flex-col text-sm rounded-md">
                             <input className="mb-5 rounded-[4px] border p-3 hover:outline-none focus:outline-none hover:border-gray-300"
-                                   type="email" placeholder="EMAIL"/>
+                                   type="email"
+                                   name="email"
+                                   placeholder="EMAIL" />
                             <input className="mb-5 rounded-[4px] border p-3 hover:outline-none focus:outline-none hover:border-gray-300"
-                                   type="username" placeholder="USERNAME"/>
+                                   type="username"
+                                   name="username"
+                                   placeholder="USERNAME" />
                             <input className="mb-5 border rounded-[4px] p-3 hover:outline-none focus:outline-none hover:border-gray-300"
-                                   type="password" placeholder="PASSWORD"/>
+                                   type="password"
+                                   name="password"
+                                   placeholder="PASSWORD" />
                             <input className="border rounded-[4px] p-3 hover:outline-none focus:outline-none hover:border-gray-300"
-                                   type="password" placeholder="RETYPE PASSWORD"/>
+                                   type="password"
+                                   name="retypePassword"
+                                   placeholder="RETYPE PASSWORD"/>
                         </div>
                         <button
                             className="mt-5 w-full border p-2 bg-gray-800 text-white rounded-[4px] hover:bg-slate-700 scale-105 duration-300"
