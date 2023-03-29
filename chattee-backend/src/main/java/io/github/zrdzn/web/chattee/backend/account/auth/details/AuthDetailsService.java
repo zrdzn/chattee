@@ -1,12 +1,12 @@
 package io.github.zrdzn.web.chattee.backend.account.auth.details;
 
 import java.util.List;
-import io.github.zrdzn.web.chattee.backend.shared.DomainError;
 import io.github.zrdzn.web.chattee.backend.web.HttpResponse;
 import io.github.zrdzn.web.chattee.backend.web.security.token.AccessTokenService;
 import panda.std.Blank;
 import panda.std.Result;
 
+import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.badRequest;
 import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.conflict;
 import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.internalServerError;
 import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.notFound;
@@ -24,8 +24,10 @@ public class AuthDetailsService {
     public Result<AuthDetails, HttpResponse> createAuthDetails(AuthDetailsCreateRequest authDetailsCreateRequest) {
         return this.authDetailsRepository.saveAuthDetails(authDetailsCreateRequest, this.accessTokenService.createToken())
                 .mapErr(error -> {
-                    if (error == DomainError.AUTH_DETAILS_ALREADY_EXIST) {
-                        return conflict("Auth details already exist.");
+                    if (error == AuthDetailsError.ALREADY_EXIST) {
+                        return conflict(AuthDetailsError.ALREADY_EXIST.getMessage());
+                    } else if (error == AuthDetailsError.INVALID_ACCOUNT_ID) {
+                        return badRequest(AuthDetailsError.INVALID_ACCOUNT_ID.getMessage());
                     }
 
                     return internalServerError("Could not create auth details.");
@@ -40,8 +42,8 @@ public class AuthDetailsService {
     public Result<AuthDetails, HttpResponse> getAuthDetailsByToken(String token) {
         return this.authDetailsRepository.findAuthDetailsByToken(token)
                 .mapErr(error -> {
-                    if (error == DomainError.AUTH_DETAILS_NOT_EXIST) {
-                        return notFound("Auth details do not exist.");
+                    if (error == AuthDetailsError.NOT_EXIST) {
+                        return notFound(AuthDetailsError.NOT_EXIST.getMessage());
                     }
 
                     return internalServerError("Could not retrieve auth details.");

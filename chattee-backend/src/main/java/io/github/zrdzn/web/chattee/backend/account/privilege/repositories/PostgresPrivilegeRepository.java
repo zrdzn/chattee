@@ -7,8 +7,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import io.github.zrdzn.web.chattee.backend.account.privilege.Privilege;
+import io.github.zrdzn.web.chattee.backend.account.privilege.PrivilegeError;
 import io.github.zrdzn.web.chattee.backend.account.privilege.PrivilegeRepository;
-import io.github.zrdzn.web.chattee.backend.shared.DomainError;
 import io.github.zrdzn.web.chattee.backend.storage.postgres.PostgresStorage;
 import io.github.zrdzn.web.chattee.backend.web.security.RoutePrivilege;
 import org.tinylog.Logger;
@@ -25,7 +25,7 @@ public class PostgresPrivilegeRepository implements PrivilegeRepository {
     }
 
     @Override
-    public Result<List<Privilege>, DomainError> findPrivilegesByAccountId(long id) {
+    public Result<List<Privilege>, PrivilegeError> findPrivilegesByAccountId(long id) {
         try (Connection connection = this.postgresStorage.getHikariDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(SELECT_PRIVILEGES_BY_ACCOUNT_ID)) {
             statement.setLong(1, id);
@@ -42,7 +42,7 @@ public class PostgresPrivilegeRepository implements PrivilegeRepository {
             return Result.ok(privileges);
         } catch (SQLException exception) {
             Logger.error(exception, "Could not find privileges.");
-            return Result.error(DomainError.SQL_EXCEPTION);
+            return Result.error(PrivilegeError.SQL_EXCEPTION);
         }
     }
 

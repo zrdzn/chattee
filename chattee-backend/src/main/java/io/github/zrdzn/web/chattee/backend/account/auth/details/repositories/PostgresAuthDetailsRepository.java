@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import io.github.zrdzn.web.chattee.backend.account.auth.details.AuthDetails;
 import io.github.zrdzn.web.chattee.backend.account.auth.details.AuthDetailsCreateRequest;
-import io.github.zrdzn.web.chattee.backend.shared.DomainError;
+import io.github.zrdzn.web.chattee.backend.account.auth.details.AuthDetailsError;
 import io.github.zrdzn.web.chattee.backend.storage.postgres.PostgresStorage;
 import io.github.zrdzn.web.chattee.backend.account.auth.details.AuthDetailsRepository;
 import org.postgresql.util.PSQLState;
@@ -35,7 +35,7 @@ public class PostgresAuthDetailsRepository implements AuthDetailsRepository {
     }
 
     @Override
-    public Result<AuthDetails, DomainError> saveAuthDetails(AuthDetailsCreateRequest authDetailsCreateRequest, String token) {
+    public Result<AuthDetails, AuthDetailsError> saveAuthDetails(AuthDetailsCreateRequest authDetailsCreateRequest, String token) {
         try (Connection connection = this.postgresStorage.getHikariDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(INSERT_AUTH_DETAILS)) {
             Instant createdAt = Instant.now();
@@ -60,18 +60,18 @@ public class PostgresAuthDetailsRepository implements AuthDetailsRepository {
         } catch (SQLException exception) {
             String state = exception.getSQLState();
             if (state.equalsIgnoreCase(PSQLState.UNIQUE_VIOLATION.getState())) {
-                return Result.error(DomainError.AUTH_DETAILS_ALREADY_EXIST);
+                return Result.error(AuthDetailsError.ALREADY_EXIST);
             } else if (state.equalsIgnoreCase(PSQLState.FOREIGN_KEY_VIOLATION.getState())) {
-                return Result.error(DomainError.ACCOUNT_INVALID_ID);
+                return Result.error(AuthDetailsError.INVALID_ACCOUNT_ID);
             }
 
             Logger.error(exception, "Could not save auth details");
-            return Result.error(DomainError.SQL_EXCEPTION);
+            return Result.error(AuthDetailsError.SQL_EXCEPTION);
         }
     }
 
     @Override
-    public Result<List<AuthDetails>, DomainError> listAllAuthDetailsByAccountId(long id) {
+    public Result<List<AuthDetails>, AuthDetailsError> listAllAuthDetailsByAccountId(long id) {
         try (Connection connection = this.postgresStorage.getHikariDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(SELECT_ALL_AUTH_DETAILS_BY_ACCOUNT_ID)) {
             List<AuthDetails> authDetails = new ArrayList<>();
@@ -89,18 +89,18 @@ public class PostgresAuthDetailsRepository implements AuthDetailsRepository {
             return Result.ok(authDetails);
         } catch (SQLException exception) {
             Logger.error(exception, "Could not list all auth details.");
-            return Result.error(DomainError.SQL_EXCEPTION);
+            return Result.error(AuthDetailsError.SQL_EXCEPTION);
         }
     }
 
     @Override
-    public Result<AuthDetails, DomainError> findAuthDetailsByToken(String token) {
+    public Result<AuthDetails, AuthDetailsError> findAuthDetailsByToken(String token) {
         try (Connection connection = this.postgresStorage.getHikariDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(SELECT_AUTH_DETAILS_BY_TOKEN)) {
             statement.setString(1, token);
             ResultSet result = statement.executeQuery();
             if (!result.next()) {
-                return Result.error(DomainError.AUTH_DETAILS_NOT_EXIST);
+                return Result.error(AuthDetailsError.NOT_EXIST);
             }
 
             long accountId = result.getLong("account_id");
@@ -111,12 +111,12 @@ public class PostgresAuthDetailsRepository implements AuthDetailsRepository {
             return Result.ok(new AuthDetails(token, createdAt, accountId, expireAt, ipAddress));
         } catch (SQLException exception) {
             Logger.error(exception, "Could not find auth details.");
-            return Result.error(DomainError.SQL_EXCEPTION);
+            return Result.error(AuthDetailsError.SQL_EXCEPTION);
         }
     }
 
     @Override
-    public Result<Blank, DomainError> deleteAuthDetailsByToken(String token) {
+    public Result<Blank, AuthDetailsError> deleteAuthDetailsByToken(String token) {
         try (Connection connection = this.postgresStorage.getHikariDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(DELETE_AUTH_DETAILS_BY_TOKEN)) {
             statement.setString(1, token);
@@ -125,7 +125,7 @@ public class PostgresAuthDetailsRepository implements AuthDetailsRepository {
             return Result.ok();
         } catch (SQLException exception) {
             Logger.error(exception, "Could not delete auth details.");
-            return Result.error(DomainError.SQL_EXCEPTION);
+            return Result.error(AuthDetailsError.SQL_EXCEPTION);
         }
     }
 

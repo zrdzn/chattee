@@ -11,8 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import io.github.zrdzn.web.chattee.backend.discussion.Discussion;
 import io.github.zrdzn.web.chattee.backend.discussion.DiscussionCreateRequest;
+import io.github.zrdzn.web.chattee.backend.discussion.DiscussionError;
 import io.github.zrdzn.web.chattee.backend.discussion.DiscussionRepository;
-import io.github.zrdzn.web.chattee.backend.shared.DomainError;
 import io.github.zrdzn.web.chattee.backend.storage.postgres.PostgresStorage;
 import org.postgresql.util.PSQLState;
 import org.tinylog.Logger;
@@ -32,7 +32,7 @@ public class PostgresDiscussionRepository implements DiscussionRepository {
         this.postgresStorage = postgresStorage;
     }
 
-    public Result<Discussion, DomainError> saveDiscussion(DiscussionCreateRequest discussionCreateRequest, long authorId) {
+    public Result<Discussion, DiscussionError> saveDiscussion(DiscussionCreateRequest discussionCreateRequest, long authorId) {
         try (Connection connection = this.postgresStorage.getHikariDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(INSERT_DISCUSSION, Statement.RETURN_GENERATED_KEYS)) {
             Instant createdAt = Instant.now();
@@ -61,18 +61,18 @@ public class PostgresDiscussionRepository implements DiscussionRepository {
         } catch (SQLException exception) {
             String state = exception.getSQLState();
             if (state.equalsIgnoreCase(PSQLState.UNIQUE_VIOLATION.getState())) {
-                return Result.error(DomainError.DISCUSSION_ALREADY_EXISTS);
+                return Result.error(DiscussionError.ALREADY_EXISTS);
             } else if (state.equalsIgnoreCase(PSQLState.FOREIGN_KEY_VIOLATION.getState())) {
-                return Result.error(DomainError.ACCOUNT_INVALID_ID);
+                return Result.error(DiscussionError.INVALID_ACCOUNT_ID);
             }
 
             Logger.error(exception, "Could not save discussion.");
-            return Result.error(DomainError.SQL_EXCEPTION);
+            return Result.error(DiscussionError.SQL_EXCEPTION);
         }
     }
 
     @Override
-    public Result<List<Discussion>, DomainError> listAllDiscussions() {
+    public Result<List<Discussion>, DiscussionError> listAllDiscussions() {
         try (Connection connection = this.postgresStorage.getHikariDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(SELECT_ALL_DISCUSSIONS)) {
             List<Discussion> discussions = new ArrayList<>();
@@ -92,19 +92,19 @@ public class PostgresDiscussionRepository implements DiscussionRepository {
             return Result.ok(discussions);
         } catch (SQLException exception) {
             Logger.error(exception, "Could not list discussions.");
-            return Result.error(DomainError.SQL_EXCEPTION);
+            return Result.error(DiscussionError.SQL_EXCEPTION);
         }
     }
 
     @Override
-    public Result<Discussion, DomainError> findDiscussionById(long id) {
+    public Result<Discussion, DiscussionError> findDiscussionById(long id) {
         try (Connection connection = this.postgresStorage.getHikariDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(SELECT_DISCUSSION_BY_ID)) {
             statement.setLong(1, id);
 
             ResultSet result = statement.executeQuery();
             if (!result.next()) {
-                return Result.error(DomainError.DISCUSSION_NOT_EXISTS);
+                return Result.error(DiscussionError.NOT_EXISTS);
             }
 
             String title = result.getString("title");
@@ -117,12 +117,12 @@ public class PostgresDiscussionRepository implements DiscussionRepository {
             return Result.ok(discussion);
         } catch (SQLException exception) {
             Logger.error(exception, "Could not find discussion.");
-            return Result.error(DomainError.SQL_EXCEPTION);
+            return Result.error(DiscussionError.SQL_EXCEPTION);
         }
     }
 
     @Override
-    public Result<Blank, DomainError> deleteDiscussion(long id) {
+    public Result<Blank, DiscussionError> deleteDiscussion(long id) {
         try (Connection connection = this.postgresStorage.getHikariDataSource().getConnection();
              PreparedStatement statement = connection.prepareStatement(DELETE_DISCUSSION_BY_ID)) {
             statement.setLong(1, id);
@@ -131,7 +131,7 @@ public class PostgresDiscussionRepository implements DiscussionRepository {
             return Result.ok();
         } catch (SQLException exception) {
             Logger.error(exception, "Could not delete discussion.");
-            return Result.error(DomainError.SQL_EXCEPTION);
+            return Result.error(DiscussionError.SQL_EXCEPTION);
         }
     }
 

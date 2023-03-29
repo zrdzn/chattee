@@ -3,7 +3,6 @@ package io.github.zrdzn.web.chattee.backend.discussion;
 import java.util.List;
 import java.util.stream.Collectors;
 import io.github.zrdzn.web.chattee.backend.account.AccountService;
-import io.github.zrdzn.web.chattee.backend.shared.DomainError;
 import io.github.zrdzn.web.chattee.backend.web.HttpResponse;
 import panda.std.Blank;
 import panda.std.Result;
@@ -35,10 +34,10 @@ public class DiscussionService {
                         )
                 )
                 .mapErr(error -> {
-                    if (error == DomainError.DISCUSSION_ALREADY_EXISTS) {
-                        return conflict("Discussion already exists.");
-                    } else if (error == DomainError.ACCOUNT_INVALID_ID) {
-                        return badRequest("'authorId' does not target existing record.");
+                    if (error == DiscussionError.ALREADY_EXISTS) {
+                        return conflict(DiscussionError.ALREADY_EXISTS.getMessage());
+                    } else if (error == DiscussionError.INVALID_ACCOUNT_ID) {
+                        return badRequest(DiscussionError.INVALID_ACCOUNT_ID.getMessage());
                     }
 
                     return internalServerError("Could not create discussion.");
@@ -74,8 +73,8 @@ public class DiscussionService {
                         )
                 )
                 .mapErr(error -> {
-                    if (error == DomainError.DISCUSSION_NOT_EXISTS) {
-                        return notFound("Discussion does not exist.");
+                    if (error == DiscussionError.NOT_EXISTS) {
+                        return notFound(DiscussionError.NOT_EXISTS.getMessage());
                     }
 
                     return internalServerError("Could not retrieve discussion.");
