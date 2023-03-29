@@ -2,10 +2,10 @@ import { AuthFormHeader } from "./auth/AuthFormHeader";
 import {useState} from "react";
 import { useRouter } from 'next/router'
 import axios from "axios";
+import toast from "react-hot-toast";
 
 export const LoginForm = () => {
     const [credentials, setCredentials] = useState({ email: "", password: "" })
-    const [errorMessage, setErrorMessage] = useState();
 
     let router = useRouter();
 
@@ -13,8 +13,16 @@ export const LoginForm = () => {
         event.preventDefault();
 
         axios.post("http://localhost:7070/api/v1/auth", credentials, { withCredentials: true })
-            .then(() => router.push("../"))
-            .catch(error => setErrorMessage(error.response.data.message))
+            .then(() => router.push("../")
+                .then(() => toast.success("You have successfully logged in."))
+                .catch(error => {
+                    console.error(error)
+                    toast.error("Something went wrong while redirecting.")
+                }))
+            .catch(error => {
+                console.error(error)
+                toast.error("Could not authenticate.")
+            })
     };
 
     const handleChange = (event: any) => {
@@ -37,7 +45,6 @@ export const LoginForm = () => {
                                    name="password"
                                    placeholder="PASSWORD" />
                         </div>
-                        {<div className="mt-5 text-normal text-red-500 ">{errorMessage}</div>}
                         <button className="mt-5 w-full border p-2 bg-gray-800 text-white rounded-[4px] hover:bg-slate-700 scale-105 duration-300"
                                 type="submit">Sign in
                         </button>

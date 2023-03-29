@@ -4,6 +4,7 @@ import {Dropdown} from "./Dropdown";
 import axios from "axios";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faComments, faUserPlus, faUser} from "@fortawesome/free-solid-svg-icons"
+import toast from "react-hot-toast";
 
 export const Navbar = () => {
     const [navbar, setNavbar] = useState(false);
@@ -14,9 +15,15 @@ export const Navbar = () => {
             .then((session) => {
                 axios.get(`http://localhost:7070/api/v1/accounts/${session.data.accountId}`, { withCredentials: true })
                     .then(account => setUsername(account.data.username))
-                    .catch((error) => console.error(error))
+                    .catch((error) => {
+                        console.error(error)
+                        toast.error("Could not retrieve username.")
+                    })
             })
-            .catch((error) => console.error(error));
+            .catch((error) => {
+                console.error(error)
+                toast.error("Could not retrieve session details.")
+            });
     }, []);
 
     return (

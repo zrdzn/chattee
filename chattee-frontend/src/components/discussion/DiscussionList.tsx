@@ -2,29 +2,24 @@ import {DiscussionItem} from "./DiscussionItem";
 import axios from "axios";
 import {useEffect, useState} from "react";
 import {transform} from "../../dateTransformer";
+import toast from "react-hot-toast";
 
 export const DiscussionList = () => {
     const [discussions, setDiscussions] = useState([]);
-    const [error, setError] = useState("")
 
     useEffect(() => {
         axios.get('http://localhost:7070/api/v1/discussions', { withCredentials: true })
             .then((response) => {
                 setDiscussions(response.data);
+                if (discussions.length === 0) {
+                    toast("There are no discussions yet.", {icon: '🙄'})
+                }
             })
             .catch((error) => {
                 console.error(error)
-                setError(error)
+                toast.error("Could not load discussions.")
             });
     }, []);
-
-    if (discussions.length === 0) {
-        return <h1>Nie ma żadnych dyskusji.</h1>
-    }
-
-    if (error) {
-        return <h1>{error}</h1>
-    }
 
     return (
         <div className="container mx-auto mt-24">

@@ -1,5 +1,6 @@
 import {Header} from "../components/Header";
 import {Navbar} from "../components/Navbar";
+import {Toaster} from "react-hot-toast";
 
 export const Template = ({ children }: any) => {
     return (
@@ -7,6 +8,9 @@ export const Template = ({ children }: any) => {
             <Header />
             <Navbar />
             <main>
+                <Toaster position="top-center"
+                         reverseOrder={false}
+                         toastOptions={{duration: 2000}} />
                 {children}
             </main>
         </>

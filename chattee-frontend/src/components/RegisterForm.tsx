@@ -2,6 +2,7 @@ import { AuthFormHeader } from "./auth/AuthFormHeader";
 import {useState} from "react";
 import {useRouter} from "next/router";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 export const RegisterForm = () => {
     const [credentials, setCredentials] = useState({
@@ -9,7 +10,6 @@ export const RegisterForm = () => {
         password: "",
         username: ""
     })
-    const [errorMessage, setErrorMessage] = useState()
 
     let router = useRouter();
 
@@ -17,8 +17,16 @@ export const RegisterForm = () => {
         event.preventDefault();
 
         axios.post("http://localhost:7070/api/v1/account/register")
-            .then(() => router.push("../"))
-            .catch(error => setErrorMessage(error))
+            .then(() => router.push("../")
+                .then(() => toast.success("You have been successfully registered."))
+                .catch(error => {
+                    console.error(error)
+                    toast.error("Something went wrong while redirecting.")
+                }))
+            .catch(error => {
+                console.error(error)
+                toast.error("Could not register.")
+            })
     };
 
     const handleChange = (event: any) => {
@@ -41,7 +49,6 @@ export const RegisterForm = () => {
                             <input className="border rounded-[4px] p-3 hover:outline-none focus:outline-none hover:border-gray-300"
                                    type="password" placeholder="RETYPE PASSWORD"/>
                         </div>
-                        {<div className="mt-5 text-normal text-red-500 ">{errorMessage}</div>}
                         <button
                             className="mt-5 w-full border p-2 bg-gray-800 text-white rounded-[4px] hover:bg-slate-700 scale-105 duration-300"
                             type="submit">Sign up

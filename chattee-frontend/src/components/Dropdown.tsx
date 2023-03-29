@@ -1,20 +1,24 @@
-import React, {useState} from 'react'
+import React from 'react'
 import {useRouter} from "next/router";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 export const Dropdown = ({ username }: any) => {
-    let [errorMessage, setErrorMessage] = useState("")
-
     let router = useRouter();
 
     const handleSubmit = async (event: any) => {
         event.preventDefault();
 
         axios.post("http://localhost:7070/api/v1/auth/invalidate", {}, { withCredentials: true })
-            .then(() => router.push("../"))
+            .then(() => router.push("../")
+                .then(() => toast.success("You have successfully logged out."))
+                .catch(error => {
+                    console.error(error)
+                    toast.error("Something went wrong while redirecting.")
+                }))
             .catch(error => {
                 console.error(error)
-                setErrorMessage(error.response.data.message)
+                toast.error("Could not log out.")
             })
     };
 
@@ -25,10 +29,6 @@ export const Dropdown = ({ username }: any) => {
                 <li>
                     <a onClick={handleSubmit}>Logout</a>
                 </li>
-                {errorMessage &&
-                    <li>
-                        <a className="text-red-500">{errorMessage}</a>
-                    </li>}
             </ul>
         </div>
     )
