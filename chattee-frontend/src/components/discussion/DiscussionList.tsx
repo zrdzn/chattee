@@ -11,9 +11,6 @@ export const DiscussionList = () => {
         axios.get('http://localhost:7070/api/v1/discussions', { withCredentials: true })
             .then((response) => {
                 setDiscussions(response.data);
-                if (discussions.length === 0) {
-                    toast("There are no discussions yet.", {icon: '🙄'})
-                }
             })
             .catch((error) => {
                 console.error(error)
