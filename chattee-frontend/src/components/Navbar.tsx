@@ -22,7 +22,6 @@ export const Navbar = () => {
             })
             .catch((error) => {
                 console.error(error)
-                toast.error("Could not retrieve session details.")
             });
     }, []);
 

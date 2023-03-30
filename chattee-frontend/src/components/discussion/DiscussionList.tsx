@@ -14,7 +14,6 @@ export const DiscussionList = () => {
             })
             .catch((error) => {
                 console.error(error)
-                toast.error("Could not load discussions.")
             });
     }, []);
 
