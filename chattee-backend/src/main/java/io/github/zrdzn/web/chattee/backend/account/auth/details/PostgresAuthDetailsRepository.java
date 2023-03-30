@@ -1,4 +1,4 @@
-package io.github.zrdzn.web.chattee.backend.account.auth.details.repositories;
+package io.github.zrdzn.web.chattee.backend.account.auth.details;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
