@@ -2,7 +2,6 @@ import {DiscussionItem} from "./DiscussionItem";
 import axios from "axios";
 import {useEffect, useState} from "react";
 import {transform} from "../../dateTransformer";
-import toast from "react-hot-toast";
 
 export const DiscussionList = () => {
     const [discussions, setDiscussions] = useState([]);
@@ -30,8 +29,7 @@ export const DiscussionList = () => {
                         authorName={discussion.author.username}
                         createdDate={transform(discussion.createdAt)}
                         lastReplierName="zrdzn"
-                        lastRepliedDate="January 23, 2023"
-                    />
+                        lastRepliedDate="January 23, 2023" />
                 ))}
             </div>
         </div>

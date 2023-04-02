@@ -28,7 +28,7 @@ create table if not exists discussions
     id bigserial constraint discussions_pk primary key,
     created_at timestamp not null,
     title       varchar(100)  not null,
-    description varchar(2000) not null,
+    description varchar(200) not null,
     author_id   bigserial
         constraint discussions_account_id_fk
             references accounts
@@ -39,6 +39,18 @@ alter table discussions
 
 create unique index if not exists discussions_id_uindex
     on discussions (id);
+
+create table if not exists discussions_posts (
+    id bigserial constraint discussions_posts_pk primary key,
+    created_at timestamp not null,
+    content varchar(2048),
+    author_id bigserial constraint discussions_posts_account_id_fk references accounts,
+    discussion_id bigserial constraint discussions_posts_discussions_id_fk references discussions
+);
+
+alter table discussions_posts owner to chattee;
+
+create unique index if not exists discussions_posts_uindex on discussions_posts (id);
 
 create table if not exists accounts_privileges
 (

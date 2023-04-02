@@ -18,7 +18,11 @@ import io.github.zrdzn.web.chattee.backend.account.privilege.PrivilegeService;
 import io.github.zrdzn.web.chattee.backend.account.privilege.PrivilegeWebConfig;
 import io.github.zrdzn.web.chattee.backend.account.privilege.PostgresPrivilegeRepository;
 import io.github.zrdzn.web.chattee.backend.account.auth.AuthSessionHandlerFactory;
+import io.github.zrdzn.web.chattee.backend.discussion.DiscussionRepository;
+import io.github.zrdzn.web.chattee.backend.discussion.DiscussionService;
 import io.github.zrdzn.web.chattee.backend.discussion.DiscussionWebConfig;
+import io.github.zrdzn.web.chattee.backend.discussion.PostgresDiscussionRepository;
+import io.github.zrdzn.web.chattee.backend.discussion.post.PostWebConfig;
 import io.github.zrdzn.web.chattee.backend.storage.postgres.PostgresStorage;
 import io.github.zrdzn.web.chattee.backend.account.AccountWebConfig;
 import io.github.zrdzn.web.chattee.backend.account.auth.AuthWebConfig;
@@ -89,7 +93,13 @@ public class HttpServer {
 
         new PrivilegeWebConfig(privilegeService, accountService, authService).initialize(plugin);
 
-        new DiscussionWebConfig(postgresStorage, accountService, authService).initialize(plugin);
+        DiscussionRepository discussionRepository = new PostgresDiscussionRepository(postgresStorage);
+        DiscussionService discussionService = new DiscussionService(discussionRepository, accountService);
+
+        PostWebConfig postWebConfig = new PostWebConfig(postgresStorage, accountService, authService, discussionService);
+        postWebConfig.initialize(plugin);
+
+        new DiscussionWebConfig(discussionService, authService, postWebConfig.getPostService()).initialize(plugin);
 
         new AuthWebConfig(accountService, authService).initialize(plugin);
 

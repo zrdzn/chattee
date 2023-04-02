@@ -1,12 +1,13 @@
 package io.github.zrdzn.web.chattee.backend.discussion;
 
 import io.github.zrdzn.web.chattee.backend.account.auth.AuthService;
+import io.github.zrdzn.web.chattee.backend.discussion.post.PostService;
 import io.github.zrdzn.web.chattee.backend.web.HttpResponse;
 import io.github.zrdzn.web.chattee.backend.web.security.RoutePrivilege;
 import io.javalin.community.routing.annotations.Delete;
 import io.javalin.community.routing.annotations.Endpoints;
 import io.javalin.community.routing.annotations.Get;
-import io.javalin.community.routing.annotations.Post;
+import io.github.zrdzn.web.chattee.backend.discussion.post.Post;
 import io.javalin.http.Context;
 import io.javalin.http.HttpStatus;
 import io.javalin.openapi.HttpMethod;
@@ -29,10 +30,12 @@ public class DiscussionEndpoints {
 
     private final DiscussionService discussionService;
     private final AuthService authService;
+    private final PostService postService;
 
-    public DiscussionEndpoints(DiscussionService discussionService, AuthService authService) {
+    public DiscussionEndpoints(DiscussionService discussionService, AuthService authService, PostService postService) {
         this.discussionService = discussionService;
         this.authService = authService;
+        this.postService = postService;
     }
 
     @OpenApi(
@@ -68,16 +71,16 @@ public class DiscussionEndpoints {
                             content = { @OpenApiContent(from = HttpResponse.class) }
                     )
             })
-    @Post(ENDPOINT)
+    @io.javalin.community.routing.annotations.Post(ENDPOINT)
     public void createDiscussion(Context context) {
         this.authService.authorizeFor(context, RoutePrivilege.DISCUSSION_OPEN)
                 .peek(authDetails -> bodyAsClass(context, DiscussionCreateRequest.class, "Discussion body is empty or invalid.")
                         .filterNot(discussion -> StringUtils.isEmpty(discussion.getTitle()), ignored -> badRequest("'title' must not be null."))
                         .filter(discussion -> discussion.getTitle().length() > 3, ignored -> badRequest("'title' must be longer than 3 characters."))
-                        .filter(discussion -> discussion.getTitle().length() < 31, ignored -> badRequest("'title' must be shorter than 101 characters."))
+                        .filter(discussion -> discussion.getTitle().length() < 101, ignored -> badRequest("'title' must be shorter than 101 characters."))
                         .filterNot(discussion -> StringUtils.isEmpty(discussion.getDescription()), ignored -> badRequest("'description' must not be null."))
                         .filter(discussion -> discussion.getDescription().length() > 10, ignored -> badRequest("'description' must be longer than 10 characters."))
-                        .filter(discussion -> discussion.getDescription().length() < 2001, ignored -> badRequest("'description' must be shorter than 2001 characters."))
+                        .filter(discussion -> discussion.getDescription().length() < 201, ignored -> badRequest("Description must be shorter than 201 characters."))
                         .flatMap(discussion -> this.discussionService.createDiscussion(discussion, authDetails.getAccountId()))
                         .peek(discussion -> context.status(HttpStatus.CREATED).json(discussion))
                         .onError(error -> context.status(error.code()).json(error)))
@@ -114,6 +117,48 @@ public class DiscussionEndpoints {
         this.authService.authorizeFor(context, RoutePrivilege.DISCUSSION_VIEW_ALL)
                 .peek(authDetails -> this.discussionService.getAllDiscussions()
                         .peek(discussions -> context.status(HttpStatus.OK).json(discussions))
+                        .onError(error -> context.status(error.code()).json(error)))
+                .onError(error -> context.status(error.code()).json(error));
+    }
+
+    @OpenApi(
+            path = ENDPOINT + "/{id}/posts",
+            methods = { HttpMethod.GET },
+            summary = "Get posts",
+            description = "Returns posts",
+            tags = { "Discussion" },
+            headers = {
+                    @OpenApiParam(
+                            name = "Authorization",
+                            description = "Authorization token",
+                            example = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+                    )
+            },
+            pathParams = {
+                    @OpenApiParam(
+                            name = "id",
+                            description = "A numeric identifier associated with a record in the database",
+                            required = true
+                    )
+            },
+            responses = {
+                    @OpenApiResponse(
+                            status = "200",
+                            description = "Resulted posts",
+                            content = { @OpenApiContent(from = Post[].class) }
+                    ),
+                    @OpenApiResponse(
+                            status = "401",
+                            description = "Error message caused by unauthorized access",
+                            content = { @OpenApiContent(from = HttpResponse.class) }
+                    )
+            })
+    @Get(ENDPOINT + "/{id}/posts")
+    public void findAllPostsByDiscussionId(Context context) {
+        this.authService.authorizeFor(context, RoutePrivilege.DISCUSSION_VIEW)
+                .peek(authDetails -> pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
+                        .flatMap(this.postService::findPostsByDiscussionId)
+                        .peek(posts -> context.status(HttpStatus.OK).json(posts))
                         .onError(error -> context.status(error.code()).json(error)))
                 .onError(error -> context.status(error.code()).json(error));
     }

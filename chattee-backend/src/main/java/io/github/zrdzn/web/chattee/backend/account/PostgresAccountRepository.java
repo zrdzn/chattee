@@ -9,11 +9,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import io.github.zrdzn.web.chattee.backend.account.Account;
-import io.github.zrdzn.web.chattee.backend.account.AccountCreateRequest;
-import io.github.zrdzn.web.chattee.backend.account.AccountError;
 import io.github.zrdzn.web.chattee.backend.storage.postgres.PostgresStorage;
-import io.github.zrdzn.web.chattee.backend.account.AccountRepository;
 import org.postgresql.util.PSQLState;
 import org.tinylog.Logger;
 import panda.std.Blank;
@@ -21,12 +17,12 @@ import panda.std.Result;
 
 public class PostgresAccountRepository implements AccountRepository {
 
-    private static final String INSERT_ACCOUNT = "insert into accounts (created_at, updated_at, email, password, username) values (?, ?, ?, ?, ?);";
+    private static final String INSERT_ACCOUNT = "insert into accounts (created_at, updated_at, email, password, username, avatar_url) values (?, ?, ?, ?, ?, ?);";
 
-    private static final String SELECT_ALL_ACCOUNTS = "select id, created_at, updated_at, email, password, username from accounts;";
+    private static final String SELECT_ALL_ACCOUNTS = "select id, created_at, updated_at, email, password, username, avatar_url from accounts;";
 
-    private static final String SELECT_ACCOUNT_BY_ID = "select created_at, updated_at, email, password, username from accounts where id = ?;";
-    private static final String SELECT_ACCOUNT_BY_EMAIL = "select id, created_at, updated_at, password, username from accounts where email = ?;";
+    private static final String SELECT_ACCOUNT_BY_ID = "select created_at, updated_at, email, password, username, avatar_url from accounts where id = ?;";
+    private static final String SELECT_ACCOUNT_BY_EMAIL = "select id, created_at, updated_at, password, username, avatar_url from accounts where email = ?;";
 
     private static final String DELETE_ACCOUNT_BY_ID = "delete from accounts where id = ?;";
 
@@ -47,6 +43,7 @@ public class PostgresAccountRepository implements AccountRepository {
             statement.setString(3, accountCreateRequest.getEmail());
             statement.setString(4, accountCreateRequest.getPassword());
             statement.setString(5, accountCreateRequest.getUsername());
+            statement.setString(6, accountCreateRequest.getAvatarUrl());
             statement.executeUpdate();
 
             long id = 0L;
@@ -62,7 +59,8 @@ public class PostgresAccountRepository implements AccountRepository {
                             createdAt,
                             accountCreateRequest.getEmail(),
                             accountCreateRequest.getPassword(),
-                            accountCreateRequest.getUsername()
+                            accountCreateRequest.getUsername(),
+                            accountCreateRequest.getAvatarUrl()
                     )
             );
         } catch (SQLException exception) {
@@ -90,8 +88,19 @@ public class PostgresAccountRepository implements AccountRepository {
                 String email = result.getString("email");
                 String password = result.getString("password");
                 String username = result.getString("username");
+                String avatarUrl = result.getString("avatar_url");
 
-                accounts.add(new Account(id, createdAt, updatedAt, email, password, username));
+                accounts.add(
+                        new Account(
+                                id,
+                                createdAt,
+                                updatedAt,
+                                email,
+                                password,
+                                username,
+                                avatarUrl
+                        )
+                );
             }
 
             return Result.ok(accounts);
@@ -116,8 +125,19 @@ public class PostgresAccountRepository implements AccountRepository {
             String email = result.getString("email");
             String password = result.getString("password");
             String username = result.getString("username");
+            String avatarUrl = result.getString("avatar_url");
 
-            return Result.ok(new Account(id, createdAt, updatedAt, email, password, username));
+            return Result.ok(
+                    new Account(
+                            id,
+                            createdAt,
+                            updatedAt,
+                            email,
+                            password,
+                            username,
+                            avatarUrl
+                    )
+            );
         } catch (SQLException exception) {
             Logger.error(exception, "Could not find account.");
             return Result.error(AccountError.SQL_EXCEPTION);
@@ -139,8 +159,19 @@ public class PostgresAccountRepository implements AccountRepository {
             Instant updatedAt = result.getTimestamp("updated_at").toInstant();
             String password = result.getString("password");
             String username = result.getString("username");
+            String avatarUrl = result.getString("avatar_url");
 
-            return Result.ok(new Account(id, createdAt, updatedAt, email, password, username));
+            return Result.ok(
+                    new Account(
+                            id,
+                            createdAt,
+                            updatedAt,
+                            email,
+                            password,
+                            username,
+                            avatarUrl
+                    )
+            );
         } catch (SQLException exception) {
             Logger.error(exception, "Could not find account.");
             return Result.error(AccountError.SQL_EXCEPTION);

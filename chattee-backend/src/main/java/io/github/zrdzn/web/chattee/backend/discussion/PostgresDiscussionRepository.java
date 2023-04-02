@@ -9,10 +9,6 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import io.github.zrdzn.web.chattee.backend.discussion.Discussion;
-import io.github.zrdzn.web.chattee.backend.discussion.DiscussionCreateRequest;
-import io.github.zrdzn.web.chattee.backend.discussion.DiscussionError;
-import io.github.zrdzn.web.chattee.backend.discussion.DiscussionRepository;
 import io.github.zrdzn.web.chattee.backend.storage.postgres.PostgresStorage;
 import org.postgresql.util.PSQLState;
 import org.tinylog.Logger;
@@ -23,7 +19,7 @@ public class PostgresDiscussionRepository implements DiscussionRepository {
 
     private static final String INSERT_DISCUSSION = "insert into discussions (created_at, title, description, author_id) values (?, ?, ?, ?);";
     private static final String SELECT_ALL_DISCUSSIONS = "select id, created_at, title, description, author_id from discussions;";
-    private static final String SELECT_DISCUSSION_BY_ID = "select title, description, author_id from discussions where id = ?;";
+    private static final String SELECT_DISCUSSION_BY_ID = "select created_at, title, description, author_id from discussions where id = ?;";
     private static final String DELETE_DISCUSSION_BY_ID = "delete from discussions where id = ?;";
 
     private final PostgresStorage postgresStorage;
