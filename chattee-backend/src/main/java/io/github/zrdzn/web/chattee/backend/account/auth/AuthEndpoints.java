@@ -72,7 +72,7 @@ public class AuthEndpoints {
                 .filterNot(credentials -> StringUtils.isEmpty(credentials.getEmail()), ignored -> badRequest("'email' must not be empty."))
                 .filterNot(credentials -> StringUtils.isEmpty(credentials.getPassword()), ignored -> badRequest("'password' must not be empty."))
                 .map(credentials -> {
-                    Result<Account, HttpResponse> accountMaybe = this.accountService.getAccount(credentials.getEmail());
+                    Result<Account, HttpResponse> accountMaybe = this.accountService.findRawAccount(credentials.getEmail());
                     if (accountMaybe.isErr()) {
                         return Result.error(accountMaybe.getError());
                     }

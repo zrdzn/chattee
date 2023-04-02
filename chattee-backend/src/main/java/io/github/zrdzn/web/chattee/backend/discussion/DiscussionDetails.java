@@ -1,7 +1,7 @@
 package io.github.zrdzn.web.chattee.backend.discussion;
 
 import java.time.Instant;
-import io.github.zrdzn.web.chattee.backend.account.Account;
+import io.github.zrdzn.web.chattee.backend.account.AccountDetails;
 
 public class DiscussionDetails {
 
@@ -9,12 +9,12 @@ public class DiscussionDetails {
     private Instant createdAt;
     private String title;
     private String description;
-    private Account author;
+    private AccountDetails author;
 
     public DiscussionDetails() {
     }
 
-    public DiscussionDetails(long id, Instant createdAt, String title, String description, Account author) {
+    public DiscussionDetails(long id, Instant createdAt, String title, String description, AccountDetails author) {
         this.id = id;
         this.createdAt = createdAt;
         this.title = title;
@@ -54,11 +54,11 @@ public class DiscussionDetails {
         this.description = description;
     }
 
-    public Account getAuthor() {
+    public AccountDetails getAuthor() {
         return this.author;
     }
 
-    public void setAuthor(Account author) {
+    public void setAuthor(AccountDetails author) {
         this.author = author;
     }
 

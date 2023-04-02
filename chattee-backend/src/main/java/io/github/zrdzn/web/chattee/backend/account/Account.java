@@ -10,17 +10,19 @@ public class Account {
     private String email;
     private String password;
     private String username;
+    private String avatarUrl;
 
     public Account() {
     }
 
-    public Account(long id, Instant createdAt, Instant updatedAt, String email, String password, String username) {
+    public Account(long id, Instant createdAt, Instant updatedAt, String email, String password, String username, String avatarUrl) {
         this.id = id;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.email = email;
         this.password = password;
         this.username = username;
+        this.avatarUrl = avatarUrl;
     }
 
     public long getId() {
@@ -69,6 +71,14 @@ public class Account {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getAvatarUrl() {
+        return this.avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 
 }

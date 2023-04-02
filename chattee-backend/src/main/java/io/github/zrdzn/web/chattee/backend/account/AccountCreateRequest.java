@@ -5,14 +5,16 @@ public class AccountCreateRequest {
     private String email;
     private String password;
     private String username;
+    private String avatarUrl;
 
     public AccountCreateRequest() {
     }
 
-    public AccountCreateRequest(String email, String password, String username) {
+    public AccountCreateRequest(String email, String password, String username, String avatarUrl) {
         this.email = email;
         this.password = password;
         this.username = username;
+        this.avatarUrl = avatarUrl;
     }
 
     public String getEmail() {
@@ -37,6 +39,14 @@ public class AccountCreateRequest {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public String getAvatarUrl() {
+        return this.avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
     }
 
 }
