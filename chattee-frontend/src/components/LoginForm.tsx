@@ -1,4 +1,4 @@
-import { AuthFormHeader } from "./auth/AuthFormHeader";
+import { FormHeader } from "./FormHeader";
 import {useState} from "react";
 import { useRouter } from 'next/router'
 import axios from "axios";
@@ -33,7 +33,7 @@ export const LoginForm = () => {
         <>
             <div className="flex items-center justify-center h-screen">
                 <div className="min-w-fit flex-col border bg-white px-10 py-14 shadow-md rounded-[4px] ">
-                    <AuthFormHeader title="Sign in"></AuthFormHeader>
+                    <FormHeader title="Sign in"></FormHeader>
                     <form method="post" onChange={handleChange} onSubmit={handleSubmit}>
                         <div className="flex flex-col text-sm rounded-md">
                             <input className="mb-5 rounded-[4px] border p-3 hover:outline-none focus:outline-none hover:border-gray-300"
