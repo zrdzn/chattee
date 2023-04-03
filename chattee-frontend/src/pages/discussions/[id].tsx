@@ -1,7 +1,7 @@
 import {DiscussionView} from "../../components/discussion/DiscussionView";
 import {useRouter} from "next/router";
 
-export default function Index() {
+export default function ViewDiscussion() {
     const {query, isReady} = useRouter()
     if (!isReady) {
         return <></>
