@@ -67,7 +67,7 @@ export const Navbar = () => {
                             <ul className="items-center justify-center space-y-8 md:flex md:space-x-10 md:space-y-0">
                                 <li className="text-white space-x-2">
                                     <FontAwesomeIcon icon={faPenToSquare} />
-                                    <Link href="../discussions">Open discussion</Link>
+                                    <Link href="../discussions/open">Open discussion</Link>
                                 </li>
                                 <li className="text-white space-x-2">
                                     <FontAwesomeIcon icon={faComments} />
