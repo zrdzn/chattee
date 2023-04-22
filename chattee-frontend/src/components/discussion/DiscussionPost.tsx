@@ -9,7 +9,7 @@ export const DiscussionPost = ({ content, createdDate, authorName, authorAvatarU
                         <span className="text-xs text-gray-400">{transform(createdDate)}</span>
                     </div>
                 </div>
-                <div className="p-4 border-t border-b">
+                <div style={{whiteSpace: "pre-wrap"}} className="p-4 border-t border-b">
                     {content}
                 </div>
                 <div className="p-4 flex border-b text-sm space-x-1">
