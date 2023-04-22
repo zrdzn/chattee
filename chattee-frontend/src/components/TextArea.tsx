@@ -2,11 +2,11 @@ import React, {useRef, useState} from "react";
 
 import {useAutosizeTextArea} from "../useAutosizeTextArea";
 
-export const TextArea: React.FC<{ styles: string, placeholder: string, name: string, updatePostDetails: (content: string) => void }> = (props: {
+export const TextArea: React.FC<{ styles: string, placeholder: string, name: string, contentCallback: (content: string) => void }> = (props: {
     styles: string,
     placeholder: string,
     name: string,
-    updatePostDetails: (content: string) => void
+    contentCallback: (content: string) => void
 }) => {
     const [value, setValue] = useState("");
     const textAreaReference = useRef<HTMLTextAreaElement>(null);
@@ -15,7 +15,7 @@ export const TextArea: React.FC<{ styles: string, placeholder: string, name: str
 
     const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
         setValue(event.target?.value);
-        props.updatePostDetails(event.target?.value)
+        props.contentCallback(event.target?.value)
     };
 
     return (

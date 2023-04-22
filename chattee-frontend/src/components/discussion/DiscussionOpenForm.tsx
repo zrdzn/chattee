@@ -68,7 +68,7 @@ export const DiscussionOpenForm = () => {
                                    name="description"
                                    placeholder="DESCRIPTION" />
                             <TextArea styles="mb-5 border rounded-[4px] p-3 hover:outline-none focus:outline-none hover:border-gray-300"
-                                      updatePostDetails={updatePostContent}
+                                      contentCallback={updatePostContent}
                                       name="content"
                                       placeholder="POST CONTENT" />
                         </div>
