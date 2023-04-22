@@ -1,6 +1,7 @@
 import {DiscussionPost} from "./DiscussionPost";
 import {useEffect, useState} from "react";
 import axios from "axios";
+import {DiscussionCreatePost} from "./DiscussionCreatePost";
 
 export const DiscussionView = ({ id, authorName, title, description, createdDate }: any) => {
     const [posts, setPosts] = useState([]);
@@ -31,6 +32,7 @@ export const DiscussionView = ({ id, authorName, title, description, createdDate
                                     authorName={post.author.username}
                                     authorAvatarUrl={post.author.avatarUrl} />
                 ))}
+                <DiscussionCreatePost discussionId={id} />
             </div>
         </>
     );

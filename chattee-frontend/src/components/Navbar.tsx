@@ -3,7 +3,7 @@ import Link from "next/link";
 import {Dropdown} from "./Dropdown";
 import axios from "axios";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faComments, faUserPlus, faUser} from "@fortawesome/free-solid-svg-icons"
+import {faComments, faPenToSquare, faUserPlus, faUser} from "@fortawesome/free-solid-svg-icons"
 import toast from "react-hot-toast";
 
 export const Navbar = () => {
@@ -65,6 +65,10 @@ export const Navbar = () => {
                     <div>
                         <div className={`flex-1 justify-self-center pb-3 mt-8 md:block md:pb-0 md:mt-0 ${navbar ? 'block' : 'hidden'}`}>
                             <ul className="items-center justify-center space-y-8 md:flex md:space-x-10 md:space-y-0">
+                                <li className="text-white space-x-2">
+                                    <FontAwesomeIcon icon={faPenToSquare} />
+                                    <Link href="../discussions/open">Open discussion</Link>
+                                </li>
                                 <li className="text-white space-x-2">
                                     <FontAwesomeIcon icon={faComments} />
                                     <Link href="../discussions">Discussions</Link>
