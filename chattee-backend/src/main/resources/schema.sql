@@ -8,7 +8,7 @@ create table if not exists accounts
     email      varchar(50)             not null,
     password   varchar                 not null,
     username   varchar                 not null,
-    avatar_url varchar                 not null
+    avatar_url varchar
 );
 
 alter table accounts
