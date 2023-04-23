@@ -71,7 +71,7 @@ public class AuthEndpoints {
         bodyAsClass(context, AuthCredentials.class, "Authentication body is empty or invalid.")
                 .filterNot(credentials -> StringUtils.isEmpty(credentials.getEmail()), ignored -> badRequest("'email' must not be empty."))
                 .filterNot(credentials -> StringUtils.isEmpty(credentials.getPassword()), ignored -> badRequest("'password' must not be empty."))
-                .map(credentials -> {
+                .flatMap(credentials -> {
                     Result<Account, HttpResponse> accountMaybe = this.accountService.findRawAccount(credentials.getEmail());
                     if (accountMaybe.isErr()) {
                         return Result.error(accountMaybe.getError());
@@ -83,8 +83,8 @@ public class AuthEndpoints {
                         return Result.error(unauthorized("Provided password is invalid."));
                     }
 
-                    return new AuthDetailsCreateRequest(account.getId(), Instant.now().plus(7, ChronoUnit.DAYS), context.ip());
-                }).map(authDetailsCreateDto -> this.authService.authenticate(context, (AuthDetailsCreateRequest) authDetailsCreateDto))
+                    return Result.ok(new AuthDetailsCreateRequest(account.getId(), Instant.now().plus(7, ChronoUnit.DAYS), context.ip()));
+                }).map(authDetailsCreateRequest -> this.authService.authenticate(context, authDetailsCreateRequest))
                 .peek(authenticateResult -> context.status(HttpStatus.NO_CONTENT))
                 .onError(error -> context.status(error.code()).json(error));
     }
