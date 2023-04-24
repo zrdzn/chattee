@@ -53,7 +53,7 @@ export const DiscussionOpenForm = () => {
     return (
         <>
             <div className="flex items-center justify-center h-screen">
-                <div className="w-1/3 flex-col border bg-white px-10 py-14 shadow-md rounded-[4px] ">
+                <div className="min-w-fit md:w-1/3 flex-col border bg-white px-10 py-14 shadow-md rounded-[4px] ">
                     <AuthFormHeader title="Open discussion"></AuthFormHeader>
                     <form method="post" onSubmit={handleSubmit}>
                         <div className="flex flex-col text-sm rounded-md">
