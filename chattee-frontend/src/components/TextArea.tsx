@@ -26,7 +26,7 @@ export const TextArea: React.FC<{ styles: string, placeholder: string, name: str
                   ref={textAreaReference}
                   style={{resize: "none"}}
                   className={props.styles}
-                  rows={3}
+                  rows={1}
                   value={value} />
     );
 }
