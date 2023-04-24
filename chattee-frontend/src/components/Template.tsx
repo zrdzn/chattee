@@ -8,7 +8,7 @@ export const Template = ({ children }: any) => {
             <Header />
             <Navbar />
             <main>
-                <Toaster position="top-center"
+                <Toaster position="bottom-right"
                          reverseOrder={false}
                          toastOptions={{duration: 2000}} />
                 {children}
