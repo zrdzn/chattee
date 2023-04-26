@@ -2,8 +2,10 @@ import {DiscussionPost} from "./DiscussionPost";
 import {useEffect, useState} from "react";
 import axios from "axios";
 import {DiscussionCreatePost} from "./DiscussionCreatePost";
+import toast from "react-hot-toast";
+import {transform} from "../../dateTransformer";
 
-export const DiscussionView = ({ id, authorName, title, description, createdDate }: any) => {
+export const DiscussionView = ({ id, author, title, description, createdDate }: any) => {
     const [posts, setPosts] = useState([]);
 
     useEffect(() => {
@@ -13,8 +15,9 @@ export const DiscussionView = ({ id, authorName, title, description, createdDate
             })
             .catch((error) => {
                 console.error(error)
+                toast.error("Could not load posts.")
             });
-    }, []);
+    }, [id]);
 
     return (
         <>
@@ -23,7 +26,7 @@ export const DiscussionView = ({ id, authorName, title, description, createdDate
                     <p className="text-2xl">{title} - <span className="text-gray-500 text-xl">{description}</span></p>
                 </span>
                 <span className="flex items-center mb-5">
-                    <p className="text-sm text-gray-400">Opened by {authorName} - {createdDate}</p>
+                    <p className="text-sm text-gray-400">Opened by {author.username} - {transform(createdDate)}</p>
                 </span>
                 {posts.map((post: any) => (
                     <DiscussionPost key={post.id}

@@ -1,13 +1,18 @@
 import {TextArea} from "../TextArea";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
 import {useRouter} from "next/router";
 
 export const DiscussionCreatePost: React.FC<{ discussionId: number }> = (props: { discussionId: number }) => {
-    const [postDetails, setPostDetails] = useState<{ content: string, discussionId: number }>({
-        content: "", discussionId: props.discussionId
+    const [postDetails, setPostDetails] = useState<{
+        content: string,
+        discussionId: number
+    }>({
+        content: "", discussionId: 0
     })
+
+    useEffect(() => setPostDetails(() => ({...postDetails, discussionId: props.discussionId})), [props])
 
     let router = useRouter();
 
