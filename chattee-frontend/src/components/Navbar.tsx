@@ -65,11 +65,13 @@ export const Navbar = () => {
                     <div>
                         <div className={`flex-1 justify-self-center pb-3 mt-8 md:block md:pb-0 md:mt-0 ${navbar ? 'block' : 'hidden'}`}>
                             <ul className="items-center justify-center space-y-8 md:flex md:space-x-10 md:space-y-0">
-                                <li className="text-white space-x-2">
+                                <li className="text-white space-x-2"
+                                    onClick={() => setNavbar(!navbar)}>
                                     <FontAwesomeIcon icon={faPenToSquare} />
                                     <Link href="../discussions/open">Open discussion</Link>
                                 </li>
-                                <li className="text-white space-x-2">
+                                <li className="text-white space-x-2"
+                                    onClick={() => setNavbar(!navbar)}>
                                     <FontAwesomeIcon icon={faComments} />
                                     <Link href="../discussions">Discussions</Link>
                                 </li>
@@ -79,11 +81,13 @@ export const Navbar = () => {
                                     </li>
                                     :
                                     <>
-                                        <li className="text-white space-x-2">
+                                        <li className="text-white space-x-2"
+                                            onClick={() => setNavbar(!navbar)}>
                                             <FontAwesomeIcon icon={faUserPlus} />
                                             <Link href="../account/register">Sign up</Link>
                                         </li>
-                                        <li className="text-white space-x-2">
+                                        <li className="text-white space-x-2"
+                                            onClick={() => setNavbar(!navbar)}>
                                             <FontAwesomeIcon icon={faUser} />
                                             <Link href="../account/login">Sign in</Link>
                                         </li>
