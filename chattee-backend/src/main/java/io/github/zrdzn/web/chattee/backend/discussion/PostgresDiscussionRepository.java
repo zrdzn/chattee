@@ -9,6 +9,7 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import io.github.zrdzn.web.chattee.backend.discussion.post.Post;
 import io.github.zrdzn.web.chattee.backend.storage.postgres.PostgresStorage;
 import org.postgresql.util.PSQLState;
 import org.tinylog.Logger;
@@ -21,6 +22,9 @@ public class PostgresDiscussionRepository implements DiscussionRepository {
     private static final String SELECT_ALL_DISCUSSIONS = "select id, created_at, title, description, author_id from discussions;";
     private static final String SELECT_DISCUSSION_BY_ID = "select created_at, title, description, author_id from discussions where id = ?;";
     private static final String DELETE_DISCUSSION_BY_ID = "delete from discussions where id = ?;";
+
+    private static final String GET_POSTS_COUNT_BY_ID = "select count(id) as amount from discussions_posts where discussion_id = ?;";
+    private static final String SELECT_LATEST_POST_BY_DISCUSSION_ID = "select id, created_at, content, author_id from discussions_posts where discussion_id = ? order by created_at desc limit 1;";
 
     private final PostgresStorage postgresStorage;
 
@@ -127,6 +131,49 @@ public class PostgresDiscussionRepository implements DiscussionRepository {
             return Result.ok();
         } catch (SQLException exception) {
             Logger.error(exception, "Could not delete discussion.");
+            return Result.error(DiscussionError.SQL_EXCEPTION);
+        }
+    }
+
+    @Override
+    public Result<Integer, DiscussionError> getPostsAmountById(long id) {
+        try (Connection connection = this.postgresStorage.getHikariDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(GET_POSTS_COUNT_BY_ID)) {
+            statement.setLong(1, id);
+
+            ResultSet result = statement.executeQuery();
+            if (!result.next()) {
+                return Result.ok(0);
+            }
+
+            return Result.ok(result.getInt("amount"));
+        } catch (SQLException exception) {
+            Logger.error(exception, "Could not get posts amount.");
+            return Result.error(DiscussionError.SQL_EXCEPTION);
+        }
+    }
+
+    @Override
+    public Result<Post, DiscussionError> findLatestPostById(long id) {
+        try (Connection connection = this.postgresStorage.getHikariDataSource().getConnection();
+             PreparedStatement statement = connection.prepareStatement(SELECT_LATEST_POST_BY_DISCUSSION_ID)) {
+            statement.setLong(1, id);
+
+            ResultSet result = statement.executeQuery();
+            if (!result.next()) {
+                return Result.error(DiscussionError.LATEST_POST_NOT_EXISTS);
+            }
+
+            long postId = result.getLong("id");
+            Instant createdAt = result.getTimestamp("created_at").toInstant();
+            String content = result.getString("content");
+            long authorId = result.getLong("author_id");
+
+            Post post = new Post(postId, createdAt, content, authorId, id);
+
+            return Result.ok(post);
+        } catch (SQLException exception) {
+            Logger.error(exception, "Could not find latest post.");
             return Result.error(DiscussionError.SQL_EXCEPTION);
         }
     }

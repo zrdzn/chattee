@@ -15,6 +15,10 @@ public class PostDetails {
     public PostDetails() {
     }
 
+    public PostDetails(long id, Instant createdAt, String content, AccountDetails author) {
+        this(id, createdAt, content, author, null);
+    }
+
     public PostDetails(long id, Instant createdAt, String content, AccountDetails author, DiscussionDetails discussion) {
         this.id = id;
         this.createdAt = createdAt;

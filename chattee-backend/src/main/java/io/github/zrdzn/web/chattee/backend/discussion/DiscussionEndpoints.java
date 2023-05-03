@@ -1,6 +1,7 @@
 package io.github.zrdzn.web.chattee.backend.discussion;
 
 import io.github.zrdzn.web.chattee.backend.account.auth.AuthService;
+import io.github.zrdzn.web.chattee.backend.discussion.post.PostDetails;
 import io.github.zrdzn.web.chattee.backend.discussion.post.PostService;
 import io.github.zrdzn.web.chattee.backend.web.HttpResponse;
 import io.github.zrdzn.web.chattee.backend.web.security.RoutePrivilege;
@@ -244,6 +245,51 @@ public class DiscussionEndpoints {
                 .peek(authDetails -> pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
                         .flatMap(this.discussionService::removeDiscussion)
                         .peek(ignored -> context.status(HttpStatus.OK).json(ok("Discussion has been removed.")))
+                        .onError(error -> context.status(error.code()).json(error)))
+                .onError(error -> context.status(error.code()).json(error));
+    }
+
+    @OpenApi(
+            path = ENDPOINT + "/{id}/latest-post",
+            methods = { HttpMethod.GET },
+            summary = "Get latest post",
+            description = "Returns latest post",
+            tags = { "Discussion" },
+            headers = {
+                    @OpenApiParam(
+                            name = "Authorization",
+                            description = "Authorization token",
+                            example = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+                    )
+            },
+            pathParams = @OpenApiParam(
+                    name = "id",
+                    description = "A numeric identifier associated with a record in the database",
+                    required = true
+            ),
+            responses = {
+                    @OpenApiResponse(
+                            status = "200",
+                            description = "Resulted post",
+                            content = { @OpenApiContent(from = PostDetails.class) }
+                    ),
+                    @OpenApiResponse(
+                            status = "401",
+                            description = "Error message caused by unauthorized access",
+                            content = { @OpenApiContent(from = HttpResponse.class) }
+                    ),
+                    @OpenApiResponse(
+                            status = "404",
+                            description = "Error message related to empty result based on your request",
+                            content = { @OpenApiContent(from = HttpResponse.class) }
+                    )
+            })
+    @Get(ENDPOINT + "/{id}/latest-post")
+    public void getLatestPost(Context context) {
+        this.authService.authorizeFor(context, RoutePrivilege.POST_VIEW)
+                .peek(authDetails -> pathParamAsLong(context, "id", "Specified identifier is not a valid long number.")
+                        .flatMap(this.discussionService::findLatestPostById)
+                        .peek(post -> context.status(HttpStatus.OK).json(post))
                         .onError(error -> context.status(error.code()).json(error)))
                 .onError(error -> context.status(error.code()).json(error));
     }

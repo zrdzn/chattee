@@ -25,11 +25,11 @@ export const DiscussionList = () => {
                         id={discussion.id}
                         title={discussion.title}
                         description={discussion.description}
-                        repliesAmount={616}
+                        repliesAmount={discussion.postsAmount}
                         authorName={discussion.author.username}
                         createdDate={transform(discussion.createdAt)}
-                        lastReplierName="zrdzn"
-                        lastRepliedDate="January 23, 2023" />
+                        lastReplierName={discussion.latestPost ? discussion.latestPost.author.username : "No one"}
+                        lastRepliedDate={discussion.latestPost ? transform(discussion.latestPost.createdAt) : "Never"} />
                 ))}
             </div>
         </div>

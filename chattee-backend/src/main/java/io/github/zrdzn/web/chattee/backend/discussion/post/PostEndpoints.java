@@ -101,7 +101,7 @@ public class PostEndpoints {
                     @OpenApiResponse(
                             status = "200",
                             description = "Resulted post",
-                            content = { @OpenApiContent(from = Post.class) }
+                            content = { @OpenApiContent(from = PostDetails.class) }
                     ),
                     @OpenApiResponse(
                             status = "401",
