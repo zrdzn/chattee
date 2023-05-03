@@ -2,6 +2,8 @@ import React from 'react'
 import {useRouter} from "next/router";
 import axios from "axios";
 import toast from "react-hot-toast";
+import {faRightFromBracket} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 
 export const Dropdown = ({ username }: any) => {
     let router = useRouter();
@@ -27,7 +29,9 @@ export const Dropdown = ({ username }: any) => {
             <label tabIndex={0} className="btn m-1 text-white text-base">{username}</label>
             <ul tabIndex={0} className="dropdown-content menu p-4 shadow bg-gray-700 rounded-lg w-52">
                 <li>
-                    <a onClick={handleSubmit}>Logout</a>
+                    <a onClick={handleSubmit}>
+                        <FontAwesomeIcon className="mt-1 mr-1" icon={faRightFromBracket} /> Logout
+                    </a>
                 </li>
             </ul>
         </div>
