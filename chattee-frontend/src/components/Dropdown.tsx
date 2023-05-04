@@ -20,7 +20,7 @@ export const Dropdown = ({ username }: any) => {
                 }))
             .catch(error => {
                 console.error(error)
-                toast.error("Could not log out.")
+                toast.error(error.response.data.message)
             })
     };
 

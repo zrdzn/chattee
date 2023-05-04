@@ -2,6 +2,7 @@ import {DiscussionItem} from "./DiscussionItem";
 import axios from "axios";
 import {useEffect, useState} from "react";
 import {transform} from "../../dateTransformer";
+import toast from "react-hot-toast";
 
 export const DiscussionList = () => {
     const [discussions, setDiscussions] = useState([]);
@@ -12,7 +13,17 @@ export const DiscussionList = () => {
                 setDiscussions(response.data);
             })
             .catch((error) => {
+                if (error.response.status === 401) {
+                    return
+                }
+
+                if (error.response.status === 403) {
+                    toast.error("You are not authorized to view discussions.")
+                    return
+                }
+
                 console.error(error)
+                toast.error(error.response.data.message)
             });
     }, []);
 

@@ -17,11 +17,16 @@ export const Navbar = () => {
                     .then(account => setUsername(account.data.username))
                     .catch((error) => {
                         console.error(error)
-                        toast.error("Could not retrieve username.")
+                        toast.error(error.response.data.message)
                     })
             })
             .catch((error) => {
+                if (error.response.status === 401) {
+                    return
+                }
+
                 console.error(error)
+                toast.error(error.response.data.message)
             });
     }, []);
 

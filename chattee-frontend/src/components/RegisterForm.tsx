@@ -25,7 +25,7 @@ export const RegisterForm = () => {
                 }))
             .catch(error => {
                 console.error(error)
-                toast.error("Could not register.")
+                toast.error(error.response.data.message)
             })
     };
 

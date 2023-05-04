@@ -35,7 +35,7 @@ export const DiscussionCreatePost: React.FC<{ discussionId: number }> = (props: 
                 }
 
                 console.error(error)
-                toast.error("Could not create post.")
+                toast.error(error.response.data.message)
             })
     };
 

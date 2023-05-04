@@ -15,7 +15,7 @@ export const DiscussionView = ({ id, author, title, description, createdDate }: 
             })
             .catch((error) => {
                 console.error(error)
-                toast.error("Could not load posts.")
+                toast.error(error.response.data.message)
             });
     }, [id]);
 

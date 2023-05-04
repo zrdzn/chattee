@@ -21,7 +21,7 @@ export const LoginForm = () => {
                 }))
             .catch(error => {
                 console.error(error)
-                toast.error("Could not authenticate.")
+                toast.error(error.response.data.message)
             })
     };
 

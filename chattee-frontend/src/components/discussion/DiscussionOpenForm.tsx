@@ -32,17 +32,12 @@ export const DiscussionOpenForm = () => {
                     })
                     .catch(error => {
                         console.error(error)
-                        toast.error("Could not create post inside discussion.")
+                        toast.error(error.response.data.message)
                     })
             })
             .catch(error => {
-                if (error.response.status === 401) {
-                    toast.error("You are not authenticated to do that.")
-                    return
-                }
-
                 console.error(error)
-                toast.error("Could not create discussion.")
+                toast.error(error.response.data.message)
             })
     };
 
