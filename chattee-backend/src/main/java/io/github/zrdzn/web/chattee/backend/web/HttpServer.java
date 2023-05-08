@@ -87,7 +87,7 @@ public class HttpServer {
 
         AuthService authService = new AuthService(authDetailsService, privilegeService);
 
-        AccountWebConfig accountWebConfig = new AccountWebConfig(postgresStorage, authService);
+        AccountWebConfig accountWebConfig = new AccountWebConfig(postgresStorage, privilegeService, authService);
         accountWebConfig.initialize(plugin);
         AccountService accountService = accountWebConfig.getAccountService();
 

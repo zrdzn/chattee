@@ -3,7 +3,9 @@ package io.github.zrdzn.web.chattee.backend.account;
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import java.util.List;
 import java.util.stream.Collectors;
+import io.github.zrdzn.web.chattee.backend.account.privilege.PrivilegeService;
 import io.github.zrdzn.web.chattee.backend.web.HttpResponse;
+import io.github.zrdzn.web.chattee.backend.web.security.RoutePrivilege;
 import panda.std.Blank;
 import panda.std.Result;
 
@@ -14,9 +16,11 @@ import static io.github.zrdzn.web.chattee.backend.web.HttpResponse.notFound;
 public class AccountService {
 
     private final AccountRepository accountRepository;
+    private final PrivilegeService privilegeService;
 
-    public AccountService(AccountRepository accountRepository) {
+    public AccountService(AccountRepository accountRepository, PrivilegeService privilegeService) {
         this.accountRepository = accountRepository;
+        this.privilegeService = privilegeService;
     }
 
     public Result<AccountDetails, HttpResponse> registerAccount(AccountCreateRequest accountCreateRequest) {
@@ -34,6 +38,7 @@ public class AccountService {
                                 account.getAvatarUrl()
                         )
                 )
+                .peek(account -> this.privilegeService.createPrivileges(account.getId(), RoutePrivilege.DEFAULT_ROLES))
                 .mapErr(error -> {
                     if (error == AccountError.ALREADY_EXISTS) {
                         return conflict(AccountError.ALREADY_EXISTS.getMessage());
