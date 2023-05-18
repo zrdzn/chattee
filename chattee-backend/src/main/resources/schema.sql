@@ -83,3 +83,13 @@ alter table auth_details
 
 create unique index if not exists auth_details_token_uindex
     on auth_details (token);
+
+create table if not exists web_options (
+    id bigserial constraint web_options_pk primary key,
+    name varchar not null,
+    value varchar
+);
+
+alter table web_options owner to chattee;
+
+create unique index if not exists web_options_uindex on web_options (id);
