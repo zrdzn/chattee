@@ -13,8 +13,10 @@ dependencies {
     implementation("io.javalin.community.openapi:javalin-openapi-plugin:$openapi")
     implementation("io.javalin.community.openapi:javalin-swagger-plugin:$openapi")
 
-    val cdn = "1.14.2"
-    implementation("net.dzikoysk:cdn:$cdn")
+    implementation("org.panda-lang:expressible:1.3.5")
+    implementation("org.panda-lang:panda-utilities:0.5.3-alpha")
+
+    implementation("eu.okaeri:okaeri-configs-yaml-snakeyaml:5.0.0-beta.5")
 
     val hikari = "5.0.1"
     implementation("com.zaxxer:HikariCP:$hikari")

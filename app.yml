@@ -1,0 +1,10 @@
+port: 7070
+storage:
+  host: localhost
+  port: '5432'
+  db: chattee
+  user: chattee
+  pass: chattee
+  ssl: false
+  maxPoolSize: 10
+  connectionTimeoutMs: 5000

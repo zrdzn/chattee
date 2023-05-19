@@ -1,13 +1,15 @@
 package io.github.zrdzn.web.chattee.backend.storage;
 
-public final class StorageConfig {
+import eu.okaeri.configs.OkaeriConfig;
+
+public final class StorageConfig extends OkaeriConfig {
 
     private String host = "localhost";
     private String port = "5432";
     private String db = "chattee";
     private String user = "chattee";
     private String pass = "chattee";
-    private String ssl = "false";
+    private boolean ssl = false;
     private int maxPoolSize = 10;
     private int connectionTimeoutMs = 5000;
 
@@ -51,11 +53,11 @@ public final class StorageConfig {
         this.pass = pass;
     }
 
-    public String getSsl() {
+    public boolean getSsl() {
         return this.ssl;
     }
 
-    public void setSsl(String ssl) {
+    public void setSsl(boolean ssl) {
         this.ssl = ssl;
     }
 

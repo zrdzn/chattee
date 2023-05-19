@@ -1,7 +1,5 @@
 package io.github.zrdzn.web.chattee.backend.storage;
 
-import net.dzikoysk.cdn.Cdn;
-
 public interface Storage {
 
     /**
@@ -10,7 +8,7 @@ public interface Storage {
      * configurations, parsers, default schemas creations etc.
      *
      */
-    Storage load(Cdn cdn);
+    Storage load(StorageConfig config);
 
     /**
      * Gets a type for a storage.
