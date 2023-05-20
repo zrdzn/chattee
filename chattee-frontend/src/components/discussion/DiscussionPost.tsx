@@ -13,7 +13,7 @@ export const DiscussionPost = ({ content, createdDate, authorName, authorAvatarU
                     {content}
                 </div>
                 <div className="p-4 flex border-b text-sm space-x-1">
-                    <img src={authorAvatarUrl} alt="..." className="shadow w-5 rounded-full border-none" />
+                    <img src={authorAvatarUrl ? authorAvatarUrl : process.env.defaultAvatarUrl} alt="..." className="shadow w-5 rounded-full border-none" />
                     <span>{authorName}</span>
                 </div>
             </div>
