@@ -1,14 +1,14 @@
 import {DiscussionItem} from "./DiscussionItem";
-import axios from "axios";
 import {useEffect, useState} from "react";
 import {transform} from "../../dateTransformer";
 import toast from "react-hot-toast";
+import {Axios} from "@/pages/_app";
 
 export const DiscussionList = () => {
     const [discussions, setDiscussions] = useState([]);
 
     useEffect(() => {
-        axios.get('http://localhost:7070/api/v1/discussions', { withCredentials: true })
+        Axios.get('discussions')
             .then((response) => {
                 setDiscussions(response.data);
             })

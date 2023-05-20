@@ -1,8 +1,8 @@
 import { AuthFormHeader } from "./auth/AuthFormHeader";
 import {useState} from "react";
 import { useRouter } from 'next/router'
-import axios from "axios";
 import toast from "react-hot-toast";
+import { Axios } from "@/pages/_app";
 
 export const LoginForm = () => {
     const [credentials, setCredentials] = useState({ email: "", password: "" })
@@ -12,7 +12,7 @@ export const LoginForm = () => {
     const handleSubmit = async (event: any) => {
         event.preventDefault();
 
-        axios.post("http://localhost:7070/api/v1/auth", credentials, { withCredentials: true })
+        Axios.post("auth", credentials)
             .then(() => router.push("../")
                 .then(() => toast.success("You have successfully logged in."))
                 .catch(error => {

@@ -1,19 +1,19 @@
 import {useEffect, useState} from "react";
 import Link from "next/link";
 import {Dropdown} from "./Dropdown";
-import axios from "axios";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faComments, faPenToSquare, faUserPlus, faUser} from "@fortawesome/free-solid-svg-icons"
 import toast from "react-hot-toast";
+import { Axios } from "@/pages/_app";
 
 export const Navbar = () => {
     const [navbar, setNavbar] = useState(false);
     const [username, setUsername] = useState("");
 
     useEffect(() => {
-        axios.get('http://localhost:7070/api/v1/auth/me', { withCredentials: true })
+        Axios.get('auth/me')
             .then((session) => {
-                axios.get(`http://localhost:7070/api/v1/accounts/${session.data.accountId}`, { withCredentials: true })
+                Axios.get(`accounts/${session.data.accountId}`)
                     .then(account => setUsername(account.data.username))
                     .catch((error) => {
                         console.error(error)

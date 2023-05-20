@@ -1,8 +1,8 @@
 import {DiscussionView} from "../../components/discussion/DiscussionView";
 import {useRouter} from "next/router";
 import {useEffect, useState} from "react";
-import axios from "axios";
 import toast from "react-hot-toast";
+import {Axios} from "@/pages/_app";
 
 export default function ViewDiscussion() {
     const [discussionDetails, setDiscussionDetails] = useState<{
@@ -26,7 +26,7 @@ export default function ViewDiscussion() {
 
         const { id } = router.query
 
-        axios.get(`http://localhost:7070/api/v1/discussions/${id}`, { withCredentials: true })
+        Axios.get(`discussions/${id}`)
             .then((discussion) => {
                 setDiscussionDetails(() => ({
                     id: discussion.data.id,

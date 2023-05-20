@@ -1,6 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: false,
+  env: {
+    backendUrl: 'http://localhost:7070'
+  },
 
   async redirects() {
     return [

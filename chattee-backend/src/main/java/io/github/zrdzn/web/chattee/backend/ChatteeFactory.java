@@ -10,7 +10,7 @@ public class ChatteeFactory {
     public static Chattee createDefault() {
         ChatteeConfig config = ConfigManager.create(ChatteeConfig.class, (okaeriConfig) -> {
             okaeriConfig.withConfigurer(new YamlSnakeYamlConfigurer());
-            okaeriConfig.withBindFile("app.yml");
+            okaeriConfig.withBindFile("server.yml");
             okaeriConfig.saveDefaults();
             okaeriConfig.load(true);
         });

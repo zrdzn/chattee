@@ -1,15 +1,15 @@
 import {DiscussionPost} from "./DiscussionPost";
 import {useEffect, useState} from "react";
-import axios from "axios";
 import {DiscussionCreatePost} from "./DiscussionCreatePost";
 import toast from "react-hot-toast";
 import {transform} from "../../dateTransformer";
+import {Axios} from "@/pages/_app";
 
 export const DiscussionView = ({ id, author, title, description, createdDate }: any) => {
     const [posts, setPosts] = useState([]);
 
     useEffect(() => {
-        axios.get(`http://localhost:7070/api/v1/discussions/${id}/posts`, { withCredentials: true })
+        Axios.get(`discussions/${id}/posts`)
             .then((response) => {
                 setPosts(response.data)
             })

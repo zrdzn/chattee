@@ -48,7 +48,7 @@ public class HttpServer {
                     config.http.defaultContentType = ContentType.JSON;
 
                     config.plugins.enableCors(cors -> cors.add(corsConfig -> {
-                        corsConfig.allowHost("http://localhost:3000");
+                        corsConfig.allowHost(chatteeConfig.getFrontendUrl());
                         corsConfig.allowCredentials = true;
                     }));
 

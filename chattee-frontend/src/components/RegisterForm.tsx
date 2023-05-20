@@ -1,8 +1,8 @@
 import { AuthFormHeader } from "./auth/AuthFormHeader";
 import {useState} from "react";
 import {useRouter} from "next/router";
-import axios from "axios";
 import toast from "react-hot-toast";
+import { Axios } from "@/pages/_app";
 
 export const RegisterForm = () => {
     const [credentials, setCredentials] = useState({
@@ -16,7 +16,7 @@ export const RegisterForm = () => {
     const handleSubmit = async (event: any) => {
         event.preventDefault();
 
-        axios.post("http://localhost:7070/api/v1/accounts/register", credentials)
+        Axios.post("accounts/register", credentials)
             .then(() => router.push("../")
                 .then(() => toast.success("You have been successfully registered."))
                 .catch(error => {

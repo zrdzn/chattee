@@ -2,8 +2,8 @@ import {AuthFormHeader} from "../auth/AuthFormHeader";
 import {TextArea} from "../TextArea";
 import {useState} from "react";
 import {useRouter} from "next/router";
-import axios from "axios";
 import toast from "react-hot-toast";
+import {Axios} from "@/pages/_app";
 
 export const DiscussionOpenForm = () => {
     const [discussionDetails, setDiscussionDetails] = useState({ title: "", description: "" })
@@ -18,10 +18,10 @@ export const DiscussionOpenForm = () => {
     const handleSubmit = async (event: any) => {
         event.preventDefault();
 
-        axios.post("http://localhost:7070/api/v1/discussions", discussionDetails, { withCredentials: true })
+        Axios.post("discussions", discussionDetails)
             .then(discussion => {
                 setPostDetails((previous) => ({...previous, discussionId: discussion.data.id}))
-                axios.post("http://localhost:7070/api/v1/posts", postDetails, {withCredentials: true})
+                Axios.post("posts", postDetails)
                     .then(post => {
                         router.push(post.data.discussion.id.toString())
                             .then(() => toast.success("You have opened a new discussion!"))

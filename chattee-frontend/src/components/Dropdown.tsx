@@ -1,9 +1,9 @@
 import React from 'react'
 import {useRouter} from "next/router";
-import axios from "axios";
 import toast from "react-hot-toast";
 import {faRightFromBracket, faGear, faUser} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {Axios} from "@/pages/_app";
 
 export const Dropdown = ({ username }: any) => {
     let router = useRouter();
@@ -11,7 +11,7 @@ export const Dropdown = ({ username }: any) => {
     const handleSubmit = async (event: any) => {
         event.preventDefault();
 
-        axios.post("http://localhost:7070/api/v1/auth/invalidate", {}, { withCredentials: true })
+        Axios.post("auth/invalidate", {})
             .then(() => router.push("../")
                 .then(() => toast.success("You have successfully logged out."))
                 .catch(error => {
