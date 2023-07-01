@@ -2,6 +2,9 @@
 Simple Open Source system that allows to create discussions and posts in them.
 ### Stack
 #### Frontend
-[Next.JS](https://nextjs.org/) + [TailwindCSS](https://tailwindcss.com/)
+- [Next.JS](https://nextjs.org/)
+- [TailwindCSS](https://tailwindcss.com/)
 #### Backend
-Java + [Javalin](https://javalin.io/) + [PostgreSQL](https://www.postgresql.org/)
+- [Java](https://www.java.com)
+- [Javalin](https://javalin.io/)
+- [PostgreSQL](https://www.postgresql.org/)
