@@ -1,12 +1,16 @@
 import {transform} from "../../dateTransformer";
+import {ContentOptionsMenu} from "@/components/ContentOptionsMenu";
 
-export const DiscussionPost = ({ content, createdDate, authorName, authorAvatarUrl }: any) => {
+export const DiscussionPost = ({ id, content, createdDate, authorName, authorAvatarUrl }: any) => {
     return (
         <>
             <div className="c-card block bg-white shadow-md hover:shadow-xl rounded-lg overflow-hidden mb-4">
                 <div className="p-3">
-                    <div className="flex items-center">
+                    <div className="flex flex-row justify-between items-center">
                         <span className="text-xs text-gray-400">{transform(createdDate)}</span>
+                        <span>
+                            <ContentOptionsMenu id={id} />
+                        </span>
                     </div>
                 </div>
                 <div style={{whiteSpace: "pre-wrap"}} className="p-4 border-t border-b">
