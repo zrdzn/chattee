@@ -30,6 +30,7 @@ export const DiscussionView = ({ id, author, title, description, createdDate }: 
                 </span>
                 {posts.map((post: any) => (
                     <DiscussionPost key={post.id}
+                                    id={post.id}
                                     content={post.content}
                                     createdDate={post.createdAt}
                                     authorName={post.author.username}
